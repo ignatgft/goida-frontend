@@ -7,8 +7,8 @@ class Endpoints {
     'API_BASE_URL',
   );
 
-  // Сервер развёрнут на IP 57.151.105.173:3000
-  static const String _serverIp = "http://57.151.105.173:3000/api";
+  // Сервер развёрнут на IP 57.151.105.173:8080
+  static const String _serverIp = "http://57.151.105.173:8080/api";
 
   static String get baseUrl {
     // Если задано явно через dart-define
@@ -16,7 +16,7 @@ class Endpoints {
       return _configuredBaseUrl;
     }
 
-    // Все платформы используют сервер 57.151.105.173:3000
+    // Все платформы используют сервер 57.151.105.173:8080
     return _serverIp;
   }
 
