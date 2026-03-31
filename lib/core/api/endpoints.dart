@@ -1,6 +1,3 @@
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
-
 class Endpoints {
   // Можно переопределить через --dart-define=API_BASE_URL=http://YOUR_IP:8080/api
   static const String _configuredBaseUrl = String.fromEnvironment(
@@ -22,6 +19,7 @@ class Endpoints {
 
   static const String dashboardOverview = "/dashboard/overview";
   static const String assets = "/assets";
+  static const String assetBalanceSummary = "/assets/balance-summary";
   static const String fiatRates = "/rates/fiat";
   static const String cryptoRates = "/rates/crypto";
   static const String statisticsOverview = "/stats/overview";
