@@ -51,6 +51,9 @@ class ApiClient {
     return null; // Заглушка - токен должен храниться в secure storage
   }
 
+  /// Статический геттер для baseUrl
+  static String get baseUrl => Endpoints.baseUrl;
+
   void setSessionToken(String? token) {
     _sessionToken = token;
     if (token == null || token.isEmpty) {
@@ -88,6 +91,22 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
   }) {
     return dio.delete(path, queryParameters: queryParameters);
+  }
+
+  /// Multipart POST запрос для загрузки файлов
+  Future<Response> postMultipart(
+    String path, {
+    Map<String, MultipartFile>? files,
+    Map<String, String>? data,
+  }) async {
+    FormData formData = FormData();
+    if (files != null) {
+      files.forEach((key, value) => formData.files.add(MapEntry(key, value)));
+    }
+    if (data != null) {
+      data.forEach((key, value) => formData.fields.add(MapEntry(key, value)));
+    }
+    return await dio.post(path, data: formData);
   }
 }
   

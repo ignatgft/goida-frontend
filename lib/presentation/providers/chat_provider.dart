@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../core/api/api_client.dart';
@@ -101,7 +102,7 @@ class ChatProvider extends ChangeNotifier {
       // Создаем multipart запрос
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('${ApiClient.baseUrl}${Endpoints.aiChatHistory}/$chatId/messages-with-file'),
+        Uri.parse('${ApiClient.baseUrl}/$chatId/messages-with-file'),
       );
 
       request.files.add(await http.MultipartFile.fromPath('file', file.path));
@@ -118,7 +119,7 @@ class ChatProvider extends ChangeNotifier {
       var responseData = await http.Response.fromStream(response);
 
       if (response.statusCode == 200) {
-        return responseData.data;
+        return jsonDecode(responseData.body) as Map<String, dynamic>;
       } else {
         throw Exception('Ошибка загрузки: ${response.statusCode}');
       }
