@@ -20,6 +20,7 @@ class Endpoints {
   static const String dashboardOverview = "/dashboard/overview";
   static const String assets = "/assets";
   static const String assetBalanceSummary = "/assets/balance-summary";
+  static const String assetPools = "/asset-pools";
   static const String fiatRates = "/rates/fiat";
   static const String cryptoRates = "/rates/crypto";
   static const String statisticsOverview = "/stats/overview";
@@ -31,7 +32,9 @@ class Endpoints {
   static const String profile = "/profile";
   static const String profileAvatar = "/profile/avatar";
   static const String chat = "/chat";
+  static const String chatConversations = "/chat/conversations";
   static const String processReceipt = "/receipt/process";
   static const String send = "/send";
   static const String topup = "/topup";
+  static const String walletConnect = "/wallet-connect";
 }
