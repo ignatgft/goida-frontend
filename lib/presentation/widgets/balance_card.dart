@@ -372,7 +372,7 @@ class BalanceCard extends StatelessWidget {
         _buildBalanceRow(
           theme: theme,
           l10n: l10n,
-          label: l10n.totalAssetsBalance,
+          label: 'Total Assets',
           amount: totalAssets,
           currency: provider.selectedCurrency,
           mutedColor: mutedColor,
@@ -383,7 +383,7 @@ class BalanceCard extends StatelessWidget {
         _buildBalanceRow(
           theme: theme,
           l10n: l10n,
-          label: l10n.spentBalance,
+          label: 'Spent Balance',
           amount: spentBalance,
           currency: provider.selectedCurrency,
           mutedColor: mutedColor,
@@ -408,7 +408,7 @@ class BalanceCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n.netBalance,
+                      'Net Balance',
                       style: TextStyle(
                         color: theme.colorScheme.primary,
                         fontSize: 12,

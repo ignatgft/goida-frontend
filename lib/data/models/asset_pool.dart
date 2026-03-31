@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 /// Модель пула активов (несколько валют в одном активе)
 class AssetPool {
