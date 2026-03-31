@@ -679,6 +679,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to process receipt'**
   String get receiptProcessingFailed;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get reminders;
 }
 
 class _AppLocalizationsDelegate

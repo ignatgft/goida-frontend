@@ -95,5 +95,7 @@
   "receiptLineItems": "Receipt line items",
   "quantity": "Quantity",
   "saveReceiptExpense": "Save receipt expense",
-  "receiptProcessingFailed": "Failed to process receipt"
+  "receiptProcessingFailed": "Failed to process receipt",
+  "notifications": "Notifications",
+  "reminders": "Reminders"
 }

@@ -95,5 +95,7 @@
   "receiptLineItems": "Позиции из чека",
   "quantity": "Количество",
   "saveReceiptExpense": "Сохранить расход из чека",
-  "receiptProcessingFailed": "Не удалось обработать чек"
+  "receiptProcessingFailed": "Не удалось обработать чек",
+  "notifications": "Уведомления",
+  "reminders": "Напоминания"
 }

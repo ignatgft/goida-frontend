@@ -3,7 +3,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/endpoints.dart';
-import 'package:http/http.dart' as http;
+import '../../l10n/app_localizations.dart';
+import 'package:dio/dio.dart' as dio;
 
 /// Виджет для загрузки и анализа документов (чеки, квитанции, скриншоты)
 class DocumentUploadWidget extends StatefulWidget {
@@ -42,7 +43,7 @@ class _DocumentUploadWidgetState extends State<DocumentUploadWidget> {
       final api = context.read<ApiClient>();
       final response = await api.postMultipart(
         '${Endpoints.aiChatHistory}/chats/${widget.chatId}/messages-with-file',
-        files: {'file': await http.MultipartFile.fromPath('file', file.path)},
+        files: {'file': await dio.MultipartFile.fromFile(file.path)},
         data: {'message': 'Проанализируй этот документ'},
       );
 

@@ -38,4 +38,18 @@ class Endpoints {
   static const String send = "/send";
   static const String topup = "/topup";
   static const String walletConnect = "/wallet-connect";
+  
+  // Настройки
+  static const String settingsProfile = "/settings/profile";
+  static const String settingsAvatar = "/settings/avatar";
+  static const String settingsPreferences = "/settings/preferences";
+  
+  // Уведомления
+  static const String notifications = "/notifications";
+  
+  // Напоминания
+  static const String reminders = "/reminders";
+  
+  // Документы
+  static const String documents = "/documents";
 }
