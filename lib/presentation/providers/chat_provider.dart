@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../../core/api/api_client.dart';
 import '../../core/api/endpoints.dart';
 
@@ -88,5 +90,43 @@ class ChatProvider extends ChangeNotifier {
   void clearChat() {
     _messages.clear();
     notifyListeners();
+  }
+
+  /// Загрузка файла с документом для анализа
+  Future<Map<String, dynamic>?> uploadDocument(File file, String chatId) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // Создаем multipart запрос
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${ApiClient.baseUrl}${Endpoints.aiChatHistory}/$chatId/messages-with-file'),
+      );
+
+      request.files.add(await http.MultipartFile.fromPath('file', file.path));
+      request.fields['message'] = 'Проанализируй этот документ';
+
+      // Добавляем токен авторизации
+      final token = await ApiClient.getToken();
+      if (token != null) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
+
+      // Отправляем
+      var response = await request.send();
+      var responseData = await http.Response.fromStream(response);
+
+      if (response.statusCode == 200) {
+        return responseData.data;
+      } else {
+        throw Exception('Ошибка загрузки: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Ошибка: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

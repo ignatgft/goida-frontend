@@ -45,6 +45,12 @@ class ApiClient {
 
   String? get sessionToken => _sessionToken;
 
+  /// Статический метод для получения токена (для использования вне класса)
+  static Future<String?> getToken() async {
+    // В production использовать secure storage
+    return null; // Заглушка - токен должен храниться в secure storage
+  }
+
   void setSessionToken(String? token) {
     _sessionToken = token;
     if (token == null || token.isEmpty) {
