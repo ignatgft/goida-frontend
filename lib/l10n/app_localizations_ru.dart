@@ -304,4 +304,138 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get receiptProcessingFailed => 'Не удалось обработать чек';
+
+  @override
+  String get notifications => 'Уведомления';
+
+  @override
+  String get reminders => 'Напоминания';
+
+  @override
+  String get fullName => 'Полное имя';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get baseCurrency => 'Основная валюта';
+
+  @override
+  String get monthlyBudget => 'Месячный бюджет';
+
+  @override
+  String get timezone => 'Часовой пояс';
+
+  @override
+  String get theme => 'Тема';
+
+  @override
+  String get notificationSettings => 'Настройки уведомлений';
+
+  @override
+  String get enableNotifications => 'Включить уведомления';
+
+  @override
+  String get emailNotifications => 'Email уведомления';
+
+  @override
+  String get pushNotifications => 'Push уведомления';
+
+  @override
+  String get about => 'О приложении';
+
+  @override
+  String get appVersion => 'Версия 0.1.0';
+
+  @override
+  String get appDescription =>
+      'Goida AI - это приложение для управления личными финансами с интеграцией искусственного интеллекта.';
+
+  @override
+  String get appFeatures =>
+      'Функции:\n• Учет активов и транзакций\n• Анализ расходов\n• ИИ-ассистент\n• Распознавание чеков\n• Уведомления и напоминания\n• Мультивалютность';
+
+  @override
+  String get contact => 'Контакты';
+
+  @override
+  String get takePhoto => 'Сделать фото';
+
+  @override
+  String get chooseFromGallery => 'Выбрать из галереи';
+
+  @override
+  String get deleteAvatar => 'Удалить аватар';
+
+  @override
+  String get messenger => 'Мессенджер';
+
+  @override
+  String get messages => 'Сообщения';
+
+  @override
+  String get conversations => 'Диалоги';
+
+  @override
+  String get unreadMessages => 'Непрочитанные сообщения';
+
+  @override
+  String get sendMessage => 'Отправить сообщение';
+
+  @override
+  String get typeMessage => 'Введите сообщение...';
+
+  @override
+  String get attachFile => 'Прикрепить файл';
+
+  @override
+  String get attachImage => 'Прикрепить изображение';
+
+  @override
+  String get analyzeDocument => 'Анализ документа';
+
+  @override
+  String get documentType => 'Тип документа';
+
+  @override
+  String get amount => 'Сумма';
+
+  @override
+  String get date => 'Дата';
+
+  @override
+  String get category => 'Категория';
+
+  @override
+  String get addToSystem => 'Добавить в систему';
+
+  @override
+  String get cancel => 'Отмена';
+
+  @override
+  String get confirm => 'Подтвердить';
+
+  @override
+  String get expense => 'Расход';
+
+  @override
+  String get income => 'Доход';
+
+  @override
+  String get analysisResult => 'Результат анализа';
+
+  @override
+  String get uploadFile => 'Загрузить файл';
+
+  @override
+  String get uploadImage => 'Загрузить изображение';
+
+  @override
+  String get contextWindow => 'Контекст';
+
+  @override
+  String get enterContext => 'Введите контекст разговора...';
+
+  @override
+  String get aiAssistant => 'ИИ Ассистент';
 }

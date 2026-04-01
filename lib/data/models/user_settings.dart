@@ -3,6 +3,9 @@ import 'balance.dart';
 
 /// Модель настроек пользователя
 class UserSettings {
+  final String? id;
+  final String email;
+  final String fullName;
   final String language;
   final String theme;
   final SupportedCurrency baseCurrency;
@@ -11,8 +14,12 @@ class UserSettings {
   final bool notificationsEnabled;
   final bool emailNotifications;
   final bool pushNotifications;
+  final String timezone;
 
   const UserSettings({
+    this.id,
+    required this.email,
+    required this.fullName,
     required this.language,
     required this.theme,
     required this.baseCurrency,
@@ -21,10 +28,14 @@ class UserSettings {
     this.notificationsEnabled = true,
     this.emailNotifications = false,
     this.pushNotifications = true,
+    this.timezone = 'UTC',
   });
 
   factory UserSettings.fromJson(Map<String, dynamic> json) {
     return UserSettings(
+      id: json['id'] as String?,
+      email: json['email'] as String? ?? '',
+      fullName: json['fullName'] as String? ?? '',
       language: json['language'] as String? ?? 'ru',
       theme: json['theme'] as String? ?? 'system',
       baseCurrency: SupportedCurrencyX.fromCode(
@@ -35,10 +46,14 @@ class UserSettings {
       notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
       emailNotifications: json['emailNotifications'] as bool? ?? false,
       pushNotifications: json['pushNotifications'] as bool? ?? true,
+      timezone: json['timezone'] as String? ?? 'UTC',
     );
   }
 
   Map<String, dynamic> toJson() => {
+        'id': id,
+        'email': email,
+        'fullName': fullName,
         'language': language,
         'theme': theme,
         'baseCurrency': baseCurrency.code,
@@ -47,9 +62,13 @@ class UserSettings {
         'notificationsEnabled': notificationsEnabled,
         'emailNotifications': emailNotifications,
         'pushNotifications': pushNotifications,
+        'timezone': timezone,
       };
 
   UserSettings copyWith({
+    String? id,
+    String? email,
+    String? fullName,
     String? language,
     String? theme,
     SupportedCurrency? baseCurrency,
@@ -58,8 +77,12 @@ class UserSettings {
     bool? notificationsEnabled,
     bool? emailNotifications,
     bool? pushNotifications,
+    String? timezone,
   }) {
     return UserSettings(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      fullName: fullName ?? this.fullName,
       language: language ?? this.language,
       theme: theme ?? this.theme,
       baseCurrency: baseCurrency ?? this.baseCurrency,
@@ -68,6 +91,7 @@ class UserSettings {
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       emailNotifications: emailNotifications ?? this.emailNotifications,
       pushNotifications: pushNotifications ?? this.pushNotifications,
+      timezone: timezone ?? this.timezone,
     );
   }
 }

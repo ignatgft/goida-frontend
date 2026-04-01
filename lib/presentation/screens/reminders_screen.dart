@@ -313,13 +313,12 @@ class _ReminderTile extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: reminder.type.icon.color?.withOpacity(0.1) ??
-                    theme.primaryColor.withOpacity(0.1),
+                color: theme.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 reminder.type.icon,
-                color: reminder.type.icon.color ?? theme.primaryColor,
+                color: theme.primaryColor,
                 size: 20,
               ),
             ),

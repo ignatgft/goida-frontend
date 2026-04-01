@@ -1,133 +1,115 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
 /// Модель сообщения мессенджера
 class ChatMessage {
   final String id;
-  final String conversationId;
   final String senderId;
-  final String recipientId;
+  final String senderName;
+  final String? senderAvatarUrl;
+  final String receiverId;
+  final String receiverName;
   final String content;
-  final MessageType type;
+  final String type;
+  final String? fileUrl;
+  final String? fileName;
+  final String? fileContentType;
   final bool isRead;
-  final DateTime createdAt;
-  final DateTime? readAt;
+  final DateTime sentAt;
 
-  const ChatMessage({
+  ChatMessage({
     required this.id,
-    required this.conversationId,
     required this.senderId,
-    required this.recipientId,
+    required this.senderName,
+    this.senderAvatarUrl,
+    required this.receiverId,
+    required this.receiverName,
     required this.content,
     required this.type,
+    this.fileUrl,
+    this.fileName,
+    this.fileContentType,
     required this.isRead,
-    required this.createdAt,
-    this.readAt,
+    required this.sentAt,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
-      id: json['id'] as String? ?? '',
-      conversationId: json['conversationId'] as String? ?? '',
-      senderId: json['senderId'] as String? ?? '',
-      recipientId: json['recipientId'] as String? ?? '',
-      content: json['content'] as String? ?? '',
-      type: MessageType.values.firstWhere(
-        (e) => e.name == json['type'],
-        orElse: () => MessageType.text,
-      ),
-      isRead: json['isRead'] as bool? ?? false,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      readAt: json['readAt'] != null ? DateTime.parse(json['readAt'] as String) : null,
+      id: json['id'] as String,
+      senderId: json['senderId'] as String,
+      senderName: json['senderName'] as String,
+      senderAvatarUrl: json['senderAvatarUrl'] as String?,
+      receiverId: json['receiverId'] as String,
+      receiverName: json['receiverName'] as String,
+      content: json['content'] as String,
+      type: json['type'] as String,
+      fileUrl: json['fileUrl'] as String?,
+      fileName: json['fileName'] as String?,
+      fileContentType: json['fileContentType'] as String?,
+      isRead: json['isRead'] as bool,
+      sentAt: DateTime.parse(json['sentAt'] as String),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'conversationId': conversationId,
-    'senderId': senderId,
-    'recipientId': recipientId,
-    'content': content,
-    'type': type.name,
-    'isRead': isRead,
-    'createdAt': createdAt.toIso8601String(),
-    'readAt': readAt?.toIso8601String(),
-  };
+        'id': id,
+        'senderId': senderId,
+        'senderName': senderName,
+        'senderAvatarUrl': senderAvatarUrl,
+        'receiverId': receiverId,
+        'receiverName': receiverName,
+        'content': content,
+        'type': type,
+        'fileUrl': fileUrl,
+        'fileName': fileName,
+        'fileContentType': fileContentType,
+        'isRead': isRead,
+        'sentAt': sentAt.toIso8601String(),
+      };
+
+  bool get isMe => senderId == 'me';
+
+  bool get isText => type == 'TEXT';
+  bool get isImage => type == 'IMAGE';
+  bool get isFile => type == 'FILE';
 }
 
-/// Модель конверсации (чат)
+/// Модель диалога
 class Conversation {
-  final String id;
-  final String user1Id;
-  final String user2Id;
-  final String lastMessage;
+  final String userId;
+  final String userName;
+  final String? userAvatarUrl;
+  final String? lastMessage;
   final DateTime? lastMessageAt;
   final int unreadCount;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
-  const Conversation({
-    required this.id,
-    required this.user1Id,
-    required this.user2Id,
-    required this.lastMessage,
+  Conversation({
+    required this.userId,
+    required this.userName,
+    this.userAvatarUrl,
+    this.lastMessage,
     this.lastMessageAt,
-    required this.unreadCount,
-    required this.createdAt,
-    required this.updatedAt,
+    this.unreadCount = 0,
   });
 
   factory Conversation.fromJson(Map<String, dynamic> json) {
     return Conversation(
-      id: json['id'] as String? ?? '',
-      user1Id: json['user1Id'] as String? ?? '',
-      user2Id: json['user2Id'] as String? ?? '',
-      lastMessage: json['lastMessage'] as String? ?? '',
+      userId: json['userId'] as String,
+      userName: json['userName'] as String,
+      userAvatarUrl: json['userAvatarUrl'] as String?,
+      lastMessage: json['lastMessage'] as String?,
       lastMessageAt: json['lastMessageAt'] != null
           ? DateTime.parse(json['lastMessageAt'] as String)
           : null,
       unreadCount: json['unreadCount'] as int? ?? 0,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'user1Id': user1Id,
-    'user2Id': user2Id,
-    'lastMessage': lastMessage,
-    'lastMessageAt': lastMessageAt?.toIso8601String(),
-    'unreadCount': unreadCount,
-    'createdAt': createdAt.toIso8601String(),
-    'updatedAt': updatedAt.toIso8601String(),
-  };
-}
-
-enum MessageType {
-  text,
-  image,
-  file,
-  system,
-  transactionNotification,
-  assetNotification,
-}
-
-extension MessageTypeX on MessageType {
-  String get displayName => switch (this) {
-    MessageType.text => 'Текст',
-    MessageType.image => 'Изображение',
-    MessageType.file => 'Файл',
-    MessageType.system => 'Системное',
-    MessageType.transactionNotification => 'Уведомление о транзакции',
-    MessageType.assetNotification => 'Уведомление об активе',
-  };
-
-  IconData get icon => switch (this) {
-    MessageType.text => Icons.chat_bubble_outline_rounded,
-    MessageType.image => Icons.image_outlined,
-    MessageType.file => Icons.insert_drive_file_outlined,
-    MessageType.system => Icons.info_outline_rounded,
-    MessageType.transactionNotification => Icons.receipt_long_rounded,
-    MessageType.assetNotification => Icons.account_balance_wallet_outlined,
-  };
+        'userId': userId,
+        'userName': userName,
+        'userAvatarUrl': userAvatarUrl,
+        'lastMessage': lastMessage,
+        'lastMessageAt': lastMessageAt?.toIso8601String(),
+        'unreadCount': unreadCount,
+      };
 }

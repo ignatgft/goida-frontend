@@ -304,4 +304,138 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get receiptProcessingFailed => 'Failed to process receipt';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get reminders => 'Reminders';
+
+  @override
+  String get fullName => 'Full Name';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get baseCurrency => 'Base Currency';
+
+  @override
+  String get monthlyBudget => 'Monthly Budget';
+
+  @override
+  String get timezone => 'Timezone';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get notificationSettings => 'Notification Settings';
+
+  @override
+  String get enableNotifications => 'Enable Notifications';
+
+  @override
+  String get emailNotifications => 'Email Notifications';
+
+  @override
+  String get pushNotifications => 'Push Notifications';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get appVersion => 'Version 0.1.0';
+
+  @override
+  String get appDescription =>
+      'Goida AI is a personal finance management application with AI integration.';
+
+  @override
+  String get appFeatures =>
+      'Features:\n• Asset and transaction tracking\n• Expense analysis\n• AI assistant\n• Receipt scanning\n• Notifications and reminders\n• Multi-currency support';
+
+  @override
+  String get contact => 'Contact';
+
+  @override
+  String get takePhoto => 'Take Photo';
+
+  @override
+  String get chooseFromGallery => 'Choose from Gallery';
+
+  @override
+  String get deleteAvatar => 'Delete Avatar';
+
+  @override
+  String get messenger => 'Messenger';
+
+  @override
+  String get messages => 'Messages';
+
+  @override
+  String get conversations => 'Conversations';
+
+  @override
+  String get unreadMessages => 'Unread Messages';
+
+  @override
+  String get sendMessage => 'Send Message';
+
+  @override
+  String get typeMessage => 'Type a message...';
+
+  @override
+  String get attachFile => 'Attach File';
+
+  @override
+  String get attachImage => 'Attach Image';
+
+  @override
+  String get analyzeDocument => 'Analyze Document';
+
+  @override
+  String get documentType => 'Document Type';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get category => 'Category';
+
+  @override
+  String get addToSystem => 'Add to System';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get expense => 'Expense';
+
+  @override
+  String get income => 'Income';
+
+  @override
+  String get analysisResult => 'Analysis Result';
+
+  @override
+  String get uploadFile => 'Upload File';
+
+  @override
+  String get uploadImage => 'Upload Image';
+
+  @override
+  String get contextWindow => 'Context';
+
+  @override
+  String get enterContext => 'Enter conversation context...';
+
+  @override
+  String get aiAssistant => 'AI Assistant';
 }

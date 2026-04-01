@@ -43,13 +43,24 @@ class Endpoints {
   static const String settingsProfile = "/settings/profile";
   static const String settingsAvatar = "/settings/avatar";
   static const String settingsPreferences = "/settings/preferences";
-  
+  static const String settingsAll = "/settings/all";
+  static const String settingsFull = "/settings/full";
+
+  // Аватарки
+  static const String avatars = "/avatars";
+  static const String activeAvatar = "/avatars/active";
+
+  // Сообщения (мессенджер)
+  static const String messages = "/messages";
+  static const String conversations = "/messages/conversations";
+  static const String unreadMessages = "/messages/unread";
+
   // Уведомления
   static const String notifications = "/notifications";
-  
+
   // Напоминания
   static const String reminders = "/reminders";
-  
+
   // Документы
   static const String documents = "/documents";
 }

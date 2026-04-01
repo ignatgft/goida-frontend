@@ -596,6 +596,8 @@ class _AssetPercentageRing extends StatelessWidget {
   }
 }
 
+// Unused widget reserved for future use
+// ignore: unused_element
 class _ExpenseRing extends StatelessWidget {
   final double progress;
   final String label;

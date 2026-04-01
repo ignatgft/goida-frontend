@@ -25,11 +25,14 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await api.get(Endpoints.settingsProfile);
+      final response = await api.get(Endpoints.settingsFull);
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         _settings = UserSettings(
+          id: data['id'] as String?,
+          email: data['email'] as String? ?? '',
+          fullName: data['fullName'] as String? ?? '',
           language: data['language'] as String? ?? 'ru',
           theme: data['theme'] as String? ?? 'system',
           baseCurrency: SupportedCurrencyX.fromCode(
@@ -37,6 +40,10 @@ class SettingsProvider extends ChangeNotifier {
           ),
           monthlyBudget: (data['monthlyBudget'] as num?)?.toDouble() ?? 0.0,
           avatarUrl: data['avatarUrl'] as String?,
+          notificationsEnabled: data['emailNotifications'] as bool? ?? true,
+          emailNotifications: data['emailNotifications'] as bool? ?? false,
+          pushNotifications: data['pushNotifications'] as bool? ?? true,
+          timezone: data['timezone'] as String? ?? 'UTC',
         );
       }
     } catch (e) {
@@ -49,19 +56,29 @@ class SettingsProvider extends ChangeNotifier {
 
   /// Обновить настройки
   Future<bool> updateSettings({
+    String? fullName,
     String? language,
     String? theme,
     SupportedCurrency? baseCurrency,
     double? monthlyBudget,
+    bool? emailNotifications,
+    bool? pushNotifications,
+    bool? notificationsEnabled,
+    String? timezone,
   }) async {
     try {
       final response = await api.put(
-        Endpoints.settingsProfile,
+        Endpoints.settingsAll,
         {
+          if (fullName != null) 'fullName': fullName,
           if (language != null) 'language': language,
           if (theme != null) 'theme': theme,
           if (baseCurrency != null) 'baseCurrency': baseCurrency.code,
           if (monthlyBudget != null) 'monthlyBudget': monthlyBudget,
+          if (emailNotifications != null) 'emailNotifications': emailNotifications,
+          if (pushNotifications != null) 'pushNotifications': pushNotifications,
+          if (notificationsEnabled != null) 'notificationsEnabled': notificationsEnabled,
+          if (timezone != null) 'timezone': timezone,
         },
       );
 
@@ -106,7 +123,7 @@ class SettingsProvider extends ChangeNotifier {
     try {
       final response = await api.delete(Endpoints.settingsAvatar);
 
-      if (response.statusCode == 204) {
+      if (response.statusCode == 204 || response.statusCode == 200) {
         await loadSettings();
         return true;
       }

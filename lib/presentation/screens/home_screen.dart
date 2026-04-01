@@ -10,6 +10,7 @@ import '../widgets/receipt_review_sheet.dart';
 import 'history_screen.dart';
 import 'settings_screen.dart';
 import 'notifications_screen.dart';
+import 'messenger_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,6 +45,16 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline_rounded),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MessengerScreen()),
+              );
+            },
+            tooltip: l10n.messenger,
+          ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
