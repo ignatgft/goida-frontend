@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primaryGreen = Color(0xFF00D09E);
+  // Apple-style blue color
+  static const Color primaryBlue = Color(0xFF007AFF);
   static const Color pureBlack = Colors.black;
   static const Color pureWhite = Colors.white;
 
@@ -14,10 +15,10 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: pureBlack,
-    primaryColor: primaryGreen,
+    primaryColor: primaryBlue,
     colorScheme: const ColorScheme.dark(
-      primary: primaryGreen,
-      onPrimary: pureBlack,
+      primary: primaryBlue,
+      onPrimary: pureWhite,
       surface: pureBlack,
       onSurface: pureWhite,
       outline: borderDark,
@@ -43,7 +44,7 @@ class AppTheme {
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: pureBlack,
-      selectedItemColor: primaryGreen,
+      selectedItemColor: primaryBlue,
       unselectedItemColor: Colors.white24,
       type: BottomNavigationBarType.fixed,
       elevation: 0,
@@ -63,9 +64,9 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.light,
     scaffoldBackgroundColor: pureWhite,
-    primaryColor: primaryGreen,
+    primaryColor: primaryBlue,
     colorScheme: const ColorScheme.light(
-      primary: primaryGreen,
+      primary: primaryBlue,
       onPrimary: pureWhite,
       surface: pureWhite,
       onSurface: pureBlack,
@@ -92,7 +93,7 @@ class AppTheme {
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: pureWhite,
-      selectedItemColor: primaryGreen,
+      selectedItemColor: primaryBlue,
       unselectedItemColor: Colors.black26,
       type: BottomNavigationBarType.fixed,
       elevation: 0,
