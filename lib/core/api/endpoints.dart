@@ -32,6 +32,8 @@ class Endpoints {
   static const String profile = "/profile";
   static const String profileAvatar = "/profile/avatar";
   static const String chat = "/chat";
+  static const String chatSessions = "/chat-sessions";
+  static const String chatSessionsAi = "/chat-sessions/ai";
   static const String chatConversations = "/chat/conversations";
   static const String aiChatHistory = "/ai-chat";
   static const String processReceipt = "/receipt/process";

@@ -33,6 +33,40 @@ class AiChatMessage {
   }
 }
 
+/// Модель сессии чата
+class ChatSession {
+  final String id;
+  final String title;
+  final String? previewMessage;
+  final String? sessionType;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  ChatSession({
+    required this.id,
+    required this.title,
+    this.previewMessage,
+    this.sessionType,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory ChatSession.fromJson(Map<String, dynamic> json) {
+    return ChatSession(
+      id: json['id'] as String,
+      title: json['title'] as String? ?? 'New Chat',
+      previewMessage: json['previewMessage'] as String?,
+      sessionType: json['sessionType'] as String?,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : DateTime.now(),
+    );
+  }
+}
+
 /// Результат анализа документа
 class AiAnalysisResult {
   final String documentType;
@@ -71,6 +105,8 @@ class ChatProvider extends ChangeNotifier {
   bool _isLoading = false;
   Locale? _currentLocale;
   String? _chatId;
+  List<ChatSession> _sessions = [];
+  ChatSession? _currentSession;
 
   ChatProvider(this.api);
 
@@ -78,9 +114,69 @@ class ChatProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   Locale? get currentLocale => _currentLocale;
   String? get chatId => _chatId;
+  List<ChatSession> get sessions => _sessions;
+  ChatSession? get currentSession => _currentSession;
 
   void setLocale(Locale? locale) {
     _currentLocale = locale;
+  }
+
+  /// Загрузить список сессий AI чатов
+  Future<void> loadSessions() async {
+    try {
+      final response = await api.get(Endpoints.chatSessionsAi);
+      if (response.statusCode == 200) {
+        _sessions = (response.data as List)
+            .map((json) => ChatSession.fromJson(json as Map<String, dynamic>))
+            .toList();
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Error loading chat sessions: $e');
+    }
+  }
+
+  /// Создать новую AI сессию
+  Future<ChatSession?> createSession(String? title) async {
+    try {
+      final response = await api.post(
+        Endpoints.chatSessionsAi,
+        title != null && title.isNotEmpty ? {'title': title} : {},
+      );
+      if (response.statusCode == 200) {
+        final session = ChatSession.fromJson(response.data as Map<String, dynamic>);
+        _sessions.insert(0, session);
+        notifyListeners();
+        return session;
+      }
+    } catch (e) {
+      debugPrint('Error creating session: $e');
+    }
+    return null;
+  }
+
+  /// Выбрать текущую сессию
+  void selectSession(ChatSession session) {
+    _currentSession = session;
+    _chatId = session.id;
+    notifyListeners();
+  }
+
+  /// Удалить сессию
+  Future<void> deleteSession(String sessionId) async {
+    try {
+      final response = await api.delete('${Endpoints.chatSessions}/$sessionId');
+      if (response.statusCode == 200) {
+        _sessions.removeWhere((s) => s.id == sessionId);
+        if (_currentSession?.id == sessionId) {
+          _currentSession = null;
+          _chatId = null;
+        }
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Error deleting session: $e');
+    }
   }
 
   Future<void> sendMessage(
