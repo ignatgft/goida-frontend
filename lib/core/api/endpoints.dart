@@ -55,6 +55,9 @@ class Endpoints {
   static const String conversations = "/messages/conversations";
   static const String unreadMessages = "/messages/unread";
 
+  // Поиск пользователей
+  static const String usersSearch = "/users/search";
+
   // Уведомления
   static const String notifications = "/notifications";
 

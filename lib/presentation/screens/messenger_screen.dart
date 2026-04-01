@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -5,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../providers/messenger_provider.dart';
 import '../../data/models/chat_message.dart' as messenger;
+import '../../core/api/api_client.dart';
+import '../../core/api/endpoints.dart';
 
 /// Экран мессенджера
 class MessengerScreen extends StatefulWidget {
@@ -16,12 +19,54 @@ class MessengerScreen extends StatefulWidget {
 
 class _MessengerScreenState extends State<MessengerScreen> {
   messenger.Conversation? _selectedConversation;
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> _searchResults = [];
+  bool _isSearching = false;
+  Timer? _debounceTimer;
 
   @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      context.read<MessengerProvider>().loadConversations();
+  void dispose() {
+    _searchController.dispose();
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  void _searchUsers(String query) async {
+    if (query.length < 2) {
+      setState(() {
+        _searchResults = [];
+      });
+      return;
+    }
+
+    setState(() {
+      _isSearching = true;
+    });
+
+    try {
+      final response = await ApiClient().get(
+        Endpoints.usersSearch,
+        queryParameters: {'q': query},
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _searchResults = List<Map<String, dynamic>>.from(response.data);
+        });
+      }
+    } catch (e) {
+      debugPrint('Search error: $e');
+    } finally {
+      setState(() {
+        _isSearching = false;
+      });
+    }
+  }
+
+  void _onSearchChanged(String query) {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      _searchUsers(query);
     });
   }
 
@@ -46,16 +91,71 @@ class _MessengerScreenState extends State<MessengerScreen> {
             : null,
       ),
       body: _selectedConversation == null
-          ? _ConversationsList(
-              onConversationSelected: (conversation) {
-                setState(() {
-                  _selectedConversation = conversation;
-                });
-                context
-                    .read<MessengerProvider>()
-                    .loadMessages(conversation!.userId);
-                context.read<MessengerProvider>().markAsRead(conversation!.userId);
-              },
+          ? Column(
+              children: [
+                // Поиск пользователей
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: _onSearchChanged,
+                    decoration: InputDecoration(
+                      hintText: 'Поиск по @username',
+                      prefixIcon: const Icon(Icons.search_rounded),
+                      suffixIcon: _isSearching
+                          ? const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            )
+                          : _searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear_rounded),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() {
+                                      _searchResults = [];
+                                    });
+                                  },
+                                )
+                              : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Theme.of(context).colorScheme.surfaceVariant,
+                    ),
+                  ),
+                ),
+                // Результаты поиска или список диалогов
+                Expanded(
+                  child: _searchResults.isNotEmpty
+                      ? _SearchResultsList(
+                          results: _searchResults,
+                          onUserSelected: (user) {
+                            _searchController.clear();
+                            setState(() {
+                              _searchResults = [];
+                            });
+                            // TODO: Начать чат с выбранным пользователем
+                          },
+                        )
+                      : _ConversationsList(
+                          onConversationSelected: (conversation) {
+                            setState(() {
+                              _selectedConversation = conversation;
+                            });
+                            context
+                                .read<MessengerProvider>()
+                                .loadMessages(conversation!.userId);
+                            context.read<MessengerProvider>().markAsRead(conversation!.userId);
+                          },
+                        ),
+                ),
+              ],
             )
           : _ChatView(conversation: _selectedConversation!),
     );
@@ -466,5 +566,60 @@ class _MessageBubble extends StatelessWidget {
 
   String _formatMessageTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+/// Список результатов поиска пользователей
+class _SearchResultsList extends StatelessWidget {
+  final List<Map<String, dynamic>> results;
+  final Function(Map<String, dynamic>) onUserSelected;
+
+  const _SearchResultsList({
+    required this.results,
+    required this.onUserSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: results.length,
+      itemBuilder: (context, index) {
+        final user = results[index];
+        final username = user['username'] ?? '';
+        final fullName = user['fullName'] ?? '';
+        final avatarUrl = user['avatarUrl'] as String?;
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 8),
+          child: ListTile(
+            leading: CircleAvatar(
+              radius: 24,
+              backgroundImage: avatarUrl != null
+                  ? NetworkImage(avatarUrl)
+                  : null,
+              child: avatarUrl == null
+                  ? Text(
+                      username.isNotEmpty ? username[0].toUpperCase() : '?',
+                      style: theme.textTheme.labelLarge,
+                    )
+                  : null,
+            ),
+            title: Text(
+              '@$username',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: fullName.isNotEmpty ? Text(fullName) : null,
+            trailing: Icon(
+              Icons.chat_bubble_outline_rounded,
+              color: theme.colorScheme.primary,
+            ),
+            onTap: () => onUserSelected(user),
+          ),
+        );
+      },
+    );
   }
 }
