@@ -244,15 +244,21 @@ class FinanceRepository {
     required double amount,
   }) async {
     try {
-      await api.post(Endpoints.assets, {
-        'period': period.apiValue,
+      final data = {
         'name': name,
         'type': type.apiValue,
-        'amount': amount,
-        'currency': currency.code,
-      });
+        'symbol': currency.code,
+        'balance': amount,
+      };
+      
+      if (assetId != null && assetId.isNotEmpty) {
+        await api.put('${Endpoints.assets}/$assetId', data);
+      } else {
+        await api.post(Endpoints.assets, data);
+      }
       return true;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error in saveAsset: $e');
       return false;
     }
   }
@@ -267,14 +273,14 @@ class FinanceRepository {
   }) async {
     try {
       await api.put('${Endpoints.assets}/$assetId', {
-        'period': period.apiValue,
         'name': name,
         'type': type.apiValue,
-        'amount': amount,
-        'currency': currency.code,
+        'symbol': currency.code,
+        'balance': amount,
       });
       return true;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error in updateAsset: $e');
       return false;
     }
   }
