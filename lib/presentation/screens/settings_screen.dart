@@ -8,7 +8,7 @@ import '../providers/auth_provider.dart';
 import '../../data/models/user_settings.dart';
 import '../../data/models/balance.dart';
 
-/// Экран настроек с вертикальными вкладками
+/// Экран настроек в виде списка с модальными окнами
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -17,8 +17,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _selectedTab = 0;
-
   @override
   void initState() {
     super.initState();
@@ -36,231 +34,116 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: Text(l10n.settings),
       ),
-      body: Row(
+      body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          // Вертикальное меню вкладок
-          NavigationRail(
-            extended: MediaQuery.of(context).size.width > 600,
-            selectedIndex: _selectedTab,
-            onDestinationSelected: (index) {
-              setState(() {
-                _selectedTab = index;
-              });
-            },
-            leading: Column(
-              children: [
-                const SizedBox(height: 16),
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.arrow_back_rounded),
-                ),
-              ],
-            ),
-            destinations: [
-              NavigationRailDestination(
-                icon: const Icon(Icons.person_rounded),
-                label: Text(l10n.profile),
+          // Профиль
+          _SettingsSection(
+            title: l10n.profile,
+            children: [
+              _SettingsTile(
+                icon: Icons.person_outline_rounded,
+                title: l10n.fullName,
+                subtitle: context.watch<SettingsProvider>().settings?.fullName ??
+                    context.watch<AuthProvider>().profile?.displayName ??
+                    '',
+                onTap: () => _showProfileDialog(context),
               ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.palette_rounded),
-                label: Text(l10n.appearance),
+              _SettingsTile(
+                icon: Icons.email_outlined,
+                title: l10n.email,
+                subtitle: context.watch<SettingsProvider>().settings?.email ??
+                    context.watch<AuthProvider>().profile?.email ??
+                    '',
+                enabled: false,
               ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.notifications_rounded),
-                label: Text(l10n.notifications),
+              _SettingsTile(
+                icon: Icons.account_balance_wallet_outlined,
+                title: l10n.baseCurrency,
+                subtitle: context.watch<SettingsProvider>().settings?.baseCurrency.code ??
+                    'USD',
+                onTap: () => _showCurrencyPicker(context),
               ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.info_rounded),
-                label: Text(l10n.about),
+              _SettingsTile(
+                icon: Icons.attach_money,
+                title: l10n.monthlyBudget,
+                subtitle: context.watch<SettingsProvider>().settings?.monthlyBudget.toString() ??
+                    '0',
+                onTap: () => _showBudgetDialog(context),
               ),
             ],
           ),
-          const VerticalDivider(thickness: 1, width: 1),
-          // Контент вкладок
-          Expanded(
-            child: IndexedStack(
-              index: _selectedTab,
-              children: const [
-                _ProfileTab(),
-                _AppearanceTab(),
-                _NotificationsTab(),
-                _AboutTab(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+          const SizedBox(height: 24),
 
-/// Вкладка профиля
-class _ProfileTab extends StatelessWidget {
-  const _ProfileTab();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    final provider = context.watch<SettingsProvider>();
-    final settings = provider.settings;
-    final authProvider = context.watch<AuthProvider>();
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.profile,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          // Внешний вид
+          _SettingsSection(
+            title: l10n.appearance,
+            children: [
+              _SettingsTile(
+                icon: Icons.palette_outlined,
+                title: l10n.theme,
+                subtitle: _getThemeName(
+                  context.watch<SettingsProvider>().settings?.theme ?? 'system',
+                  l10n,
+                ),
+                onTap: () => _showThemeDialog(context),
+              ),
+              _SettingsTile(
+                icon: Icons.language_rounded,
+                title: l10n.language,
+                subtitle: _getLanguageName(
+                  context.watch<SettingsProvider>().settings?.language ?? 'ru',
+                  l10n,
+                ),
+                onTap: () => _showLanguageDialog(context),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
 
-          // Аватар
-          Center(
-            child: Stack(
-              children: [
-                CircleAvatar(
-                  radius: 60,
-                  backgroundColor: theme.primaryColor.withOpacity(0.1),
-                  backgroundImage: settings?.avatarUrl != null
-                      ? NetworkImage(settings!.avatarUrl!)
-                      : null,
-                  child: settings?.avatarUrl == null
-                      ? Icon(Icons.person_rounded, size: 60)
-                      : null,
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: theme.colorScheme.surface, width: 3),
-                    ),
-                    child: IconButton(
-                      onPressed: () => _showAvatarOptions(context, provider),
-                      icon: const Icon(Icons.camera_alt_rounded, size: 20),
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 32),
-
-          // Имя
-          _SettingsTextField(
-            label: l10n.fullName,
-            initialValue: settings?.fullName ?? authProvider.profile?.displayName ?? authProvider.user?.displayName ?? '',
-            onChanged: (value) {
-              provider.updateSettings(fullName: value);
-            },
-          ),
-          const SizedBox(height: 16),
-
-          // Email (только для чтения)
-          _SettingsTextField(
-            label: l10n.email,
-            initialValue: settings?.email ?? authProvider.profile?.email ?? authProvider.user?.email ?? '',
-            enabled: false,
+          // Уведомления
+          _SettingsSection(
+            title: l10n.notifications,
+            children: [
+              _SettingsSwitchTile(
+                icon: Icons.notifications_outlined,
+                title: l10n.enableNotifications,
+                value: context.watch<SettingsProvider>().settings?.notificationsEnabled ?? true,
+                onChanged: (value) {
+                  context.read<SettingsProvider>().updateSettings(notificationsEnabled: value);
+                },
+              ),
+              _SettingsSwitchTile(
+                icon: Icons.email_outlined,
+                title: l10n.emailNotifications,
+                value: context.watch<SettingsProvider>().settings?.emailNotifications ?? false,
+                onChanged: (value) {
+                  context.read<SettingsProvider>().updateSettings(emailNotifications: value);
+                },
+              ),
+              _SettingsSwitchTile(
+                icon: Icons.phone_android_rounded,
+                title: l10n.pushNotifications,
+                value: context.watch<SettingsProvider>().settings?.pushNotifications ?? true,
+                onChanged: (value) {
+                  context.read<SettingsProvider>().updateSettings(pushNotifications: value);
+                },
+              ),
+            ],
           ),
           const SizedBox(height: 24),
 
-          // Базовая валюта
-          _SettingsCard(
-            title: l10n.baseCurrency,
-            child: DropdownButtonFormField<SupportedCurrency>(
-              value: settings?.baseCurrency ?? SupportedCurrency.usd,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+          // О приложении
+          _SettingsSection(
+            title: l10n.about,
+            children: [
+              _SettingsTile(
+                icon: Icons.info_outline_rounded,
+                title: l10n.about,
+                subtitle: l10n.appVersion,
+                onTap: () => _showAboutDialog(context),
               ),
-              items: SupportedCurrencyX.fiatValues.map((currency) {
-                return DropdownMenuItem(
-                  value: currency,
-                  child: Text('${currency.code} - ${currency.symbol}'),
-                );
-              }).toList(),
-              onChanged: (currency) {
-                if (currency != null) {
-                  provider.changeBaseCurrency(currency);
-                }
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Месячный бюджет
-          _SettingsCard(
-            title: l10n.monthlyBudget,
-            child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                prefixText: '${settings?.baseCurrency.symbol ?? '\$'} ',
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-              controller: TextEditingController(
-                text: settings?.monthlyBudget.toString() ?? '0',
-              ),
-              onChanged: (value) {
-                final budget = double.tryParse(value);
-                if (budget != null) {
-                  provider.updateSettings(monthlyBudget: budget);
-                }
-              },
-            ),
-          ),
-          const SizedBox(height: 32),
-
-          // Часовой пояс
-          _SettingsCard(
-            title: l10n.timezone,
-            child: DropdownButtonFormField<String>(
-              value: settings?.timezone ?? 'UTC',
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-              items: [
-                'UTC',
-                'Europe/Moscow',
-                'Europe/London',
-                'America/New_York',
-                'America/Los_Angeles',
-                'Asia/Tokyo',
-                'Asia/Shanghai',
-              ].map((timezone) {
-                return DropdownMenuItem(
-                  value: timezone,
-                  child: Text(timezone),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  provider.updateSettings(timezone: value);
-                }
-              },
-            ),
+            ],
           ),
           const SizedBox(height: 32),
 
@@ -269,7 +152,7 @@ class _ProfileTab extends StatelessWidget {
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () {
-                authProvider.signOut();
+                context.read<AuthProvider>().signOut();
               },
               icon: const Icon(Icons.logout_rounded),
               label: Padding(
@@ -281,260 +164,258 @@ class _ProfileTab extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 16),
         ],
       ),
     );
   }
 
-  void _showAvatarOptions(BuildContext context, SettingsProvider provider) {
+  String _getThemeName(String theme, AppLocalizations l10n) {
+    switch (theme.toLowerCase()) {
+      case 'light':
+        return l10n.light;
+      case 'dark':
+        return l10n.dark;
+      default:
+        return l10n.system;
+    }
+  }
+
+  String _getLanguageName(String language, AppLocalizations l10n) {
+    switch (language.toLowerCase()) {
+      case 'en':
+        return 'English';
+      case 'ru':
+        return 'Русский';
+      default:
+        return 'Русский';
+    }
+  }
+
+  void _showProfileDialog(BuildContext context) {
+    final provider = context.read<SettingsProvider>();
+    final settings = provider.settings;
     final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController(text: settings?.fullName ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.fullName),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: l10n.fullName,
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              provider.updateSettings(fullName: controller.text.trim());
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCurrencyPicker(BuildContext context) {
+    final provider = context.read<SettingsProvider>();
+    final settings = provider.settings;
+    final l10n = AppLocalizations.of(context)!;
+
     showModalBottomSheet(
       context: context,
       builder: (context) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt_rounded),
-              title: Text(l10n.takePhoto),
-              onTap: () async {
-                Navigator.pop(context);
-                final file = await ImagePicker().pickImage(
-                  source: ImageSource.camera,
-                );
-                if (file != null) {
-                  provider.uploadAvatar(File(file.path));
-                }
-              },
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                l10n.baseCurrency,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_rounded),
-              title: Text(l10n.chooseFromGallery),
-              onTap: () async {
-                Navigator.pop(context);
-                final file = await ImagePicker().pickImage(
-                  source: ImageSource.gallery,
-                );
-                if (file != null) {
-                  provider.uploadAvatar(File(file.path));
-                }
-              },
-            ),
-            if (provider.settings?.avatarUrl != null)
-              ListTile(
-                leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-                title: Text(l10n.deleteAvatar),
-                onTap: () {
-                  Navigator.pop(context);
-                  provider.deleteAvatar();
+            SizedBox(
+              height: 300,
+              child: ListView.builder(
+                itemCount: SupportedCurrencyX.fiatValues.length,
+                itemBuilder: (context, index) {
+                  final currency = SupportedCurrencyX.fiatValues[index];
+                  final isSelected = settings?.baseCurrency.code == currency.code;
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: isSelected
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey.shade300,
+                      child: Text(
+                        currency.code,
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isSelected ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                    title: Text('${currency.code} - ${currency.symbol}'),
+                    trailing: isSelected
+                        ? Icon(Icons.check, color: Theme.of(context).primaryColor)
+                        : null,
+                    onTap: () {
+                      provider.changeBaseCurrency(currency);
+                      Navigator.pop(context);
+                    },
+                  );
                 },
               ),
+            ),
           ],
         ),
       ),
     );
   }
-}
 
-/// Вкладка внешнего вида
-class _AppearanceTab extends StatelessWidget {
-  const _AppearanceTab();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    final provider = context.watch<SettingsProvider>();
+  void _showBudgetDialog(BuildContext context) {
+    final provider = context.read<SettingsProvider>();
     final settings = provider.settings;
+    final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController(
+      text: settings?.monthlyBudget.toString() ?? '0',
+    );
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.appearance,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.monthlyBudget),
+        content: TextField(
+          controller: controller,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+            labelText: l10n.monthlyBudget,
+            prefixText: '${settings?.baseCurrency.symbol ?? '\$'} ',
+            border: const OutlineInputBorder(),
           ),
-          const SizedBox(height: 24),
-
-          _SettingsCard(
-            title: l10n.theme,
-            child: Column(
-              children: AppTheme.values.map((appTheme) {
-                return RadioListTile<AppTheme>(
-                  value: appTheme,
-                  groupValue: AppThemeX.fromString(settings?.theme ?? 'system'),
-                  title: Text(appTheme.displayName),
-                  secondary: Icon(appTheme.icon),
-                  onChanged: (value) {
-                    if (value != null) {
-                      provider.changeTheme(value);
-                    }
-                  },
-                );
-              }).toList(),
-            ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
           ),
-          const SizedBox(height: 16),
-          _SettingsCard(
-            title: l10n.language,
-            child: Column(
-              children: AppLanguage.values.map((language) {
-                return RadioListTile<AppLanguage>(
-                  value: language,
-                  groupValue: AppLanguageX.fromCode(settings?.language ?? 'ru'),
-                  title: Text(language.displayName),
-                  secondary: Icon(language.icon),
-                  onChanged: (value) {
-                    if (value != null) {
-                      provider.changeLanguage(value);
-                    }
-                  },
-                );
-              }).toList(),
-            ),
+          FilledButton(
+            onPressed: () {
+              final budget = double.tryParse(controller.text.replaceAll(',', '.'));
+              if (budget != null) {
+                provider.updateSettings(monthlyBudget: budget);
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
           ),
         ],
       ),
     );
   }
-}
 
-/// Вкладка уведомлений
-class _NotificationsTab extends StatelessWidget {
-  const _NotificationsTab();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    final provider = context.watch<SettingsProvider>();
+  void _showThemeDialog(BuildContext context) {
+    final provider = context.read<SettingsProvider>();
     final settings = provider.settings;
+    final l10n = AppLocalizations.of(context)!;
+    final currentTheme = AppThemeX.fromString(settings?.theme ?? 'system');
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.notifications,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                l10n.theme,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-
-          _SettingsCard(
-            title: l10n.notificationSettings,
-            child: Column(
-              children: [
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(l10n.enableNotifications),
-                  value: settings?.notificationsEnabled ?? true,
-                  onChanged: (value) {
-                    provider.updateSettings(notificationsEnabled: value);
-                  },
-                ),
-                const Divider(),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(l10n.emailNotifications),
-                  value: settings?.emailNotifications ?? false,
-                  onChanged: (value) {
-                    provider.updateSettings(emailNotifications: value);
-                  },
-                ),
-                const Divider(),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(l10n.pushNotifications),
-                  value: settings?.pushNotifications ?? true,
-                  onChanged: (value) {
-                    provider.updateSettings(pushNotifications: value);
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
+            ...AppTheme.values.map((theme) => RadioListTile<AppTheme>(
+              value: theme,
+              groupValue: currentTheme,
+              title: Text(theme.displayName),
+              secondary: Icon(theme.icon),
+              onChanged: (value) {
+                if (value != null) {
+                  provider.changeTheme(value);
+                  Navigator.pop(context);
+                }
+              },
+            )),
+          ],
+        ),
       ),
     );
   }
-}
 
-/// Вкладка о приложении
-class _AboutTab extends StatelessWidget {
-  const _AboutTab();
+  void _showLanguageDialog(BuildContext context) {
+    final provider = context.read<SettingsProvider>();
+    final settings = provider.settings;
+    final l10n = AppLocalizations.of(context)!;
+    final currentLanguage = AppLanguageX.fromCode(settings?.language ?? 'ru');
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                l10n.language,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            ...AppLanguage.values.map((language) => RadioListTile<AppLanguage>(
+              value: language,
+              groupValue: currentLanguage,
+              title: Text(language.displayName),
+              secondary: Icon(language.icon),
+              onChanged: (value) {
+                if (value != null) {
+                  provider.changeLanguage(value);
+                  Navigator.pop(context);
+                }
+              },
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAboutDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          Icon(
-            Icons.account_balance_wallet_rounded,
-            size: 80,
-            color: theme.primaryColor,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Goida AI',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.appVersion,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
-            ),
-          ),
-          const SizedBox(height: 32),
-          _SettingsCard(
-            title: l10n.about,
-            child: Column(
-              children: [
-                Text(
-                  l10n.appDescription,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.appFeatures,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          _SettingsCard(
-            title: l10n.contact,
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.email_rounded),
-                  title: const Text('support@goida.ai'),
-                  onTap: () {
-                    // TODO: Открыть email клиент
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.telegram_rounded),
-                  title: const Text('@goida_support'),
-                  onTap: () {
-                    // TODO: Открыть Telegram
-                  },
-                ),
-              ],
-            ),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.about),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.appDescription),
+            const SizedBox(height: 16),
+            Text(l10n.appFeatures),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
           ),
         ],
       ),
@@ -542,73 +423,101 @@ class _AboutTab extends StatelessWidget {
   }
 }
 
-/// Карточка настроек
-class _SettingsCard extends StatelessWidget {
+/// Секция настроек
+class _SettingsSection extends StatelessWidget {
   final String title;
-  final Widget child;
+  final List<Widget> children;
 
-  const _SettingsCard({required this.title, required this.child});
+  const _SettingsSection({required this.title, required this.children});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Text(
+              title,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          child,
+          const Divider(height: 1),
+          ...children,
         ],
       ),
     );
   }
 }
 
-/// Поле ввода настроек
-class _SettingsTextField extends StatelessWidget {
-  final String label;
-  final String initialValue;
+/// Элемент списка настроек
+class _SettingsTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? subtitle;
   final bool enabled;
-  final Function(String)? onChanged;
+  final VoidCallback? onTap;
 
-  const _SettingsTextField({
-    required this.label,
-    required this.initialValue,
+  const _SettingsTile({
+    required this.icon,
+    required this.title,
+    this.subtitle,
     this.enabled = true,
-    this.onChanged,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return _SettingsCard(
-      title: label,
-      child: TextField(
-        enabled: enabled,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
-        ),
-        controller: TextEditingController(text: initialValue),
-        onChanged: onChanged,
-      ),
+    return ListTile(
+      leading: Icon(icon, color: theme.colorScheme.primary),
+      title: Text(title),
+      subtitle: subtitle != null ? Text(subtitle!) : null,
+      trailing: enabled
+          ? Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurface.withOpacity(0.3))
+          : null,
+      enabled: enabled,
+      onTap: onTap,
+    );
+  }
+}
+
+/// Переключатель настроек
+class _SettingsSwitchTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _SettingsSwitchTile({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SwitchListTile(
+      secondary: Icon(icon, color: theme.colorScheme.primary),
+      title: Text(title),
+      value: value,
+      onChanged: onChanged,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
     );
   }
 }

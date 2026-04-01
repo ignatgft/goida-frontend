@@ -4,6 +4,7 @@ import 'l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/screens/home_screen.dart';
 import 'presentation/screens/chat_screen.dart';
+import 'presentation/screens/messenger_screen.dart';
 import 'presentation/screens/chart_screen.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/widgets/bottom_nav.dart';
@@ -28,6 +29,7 @@ class _GoidaAppState extends State<GoidaApp> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
+    const MessengerScreen(),
     const ChatScreen(),
     const ChartScreen(),
   ];
