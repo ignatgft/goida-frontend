@@ -1,7 +1,7 @@
 name: demo2
-description: "A new Flutter project."
+description: "Goida AI - iOS Finance Tracker + AI Chat + Messenger"
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.2.0+2
 
 environment:
   sdk: ^3.11.3
@@ -16,6 +16,7 @@ dependencies:
   provider: ^6.1.2
   google_sign_in: ^6.2.1
   image_picker: ^1.0.7
+  file_picker: ^8.0.0
   shared_preferences: ^2.5.3
   web_socket_channel: ^2.4.0
   lottie: ^3.0.0
@@ -23,6 +24,10 @@ dependencies:
   animated_text_kit: ^4.2.2
   http: ^1.2.0
   http_parser: ^4.0.2
+  fl_chart: ^0.69.0
+  cupertino_icons: ^1.0.8
+  qr_flutter: ^4.1.0
+  walletconnect_dart: ^0.0.11
 
 dev_dependencies:
   flutter_test:

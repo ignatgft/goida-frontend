@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
+import '../../core/theme/ios_design_system.dart';
 import '../../data/models/transaction.dart';
 import '../providers/transaction_provider.dart';
 import '../widgets/expense_entry_sheet.dart';
@@ -50,10 +52,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(success ? 'Транзакция обновлена' : 'Ошибка обновления'),
-            backgroundColor: success ? const Color(0xFF16C784) : const Color(0xFFFF6B6B),
+            backgroundColor: success ? IosDesignSystem.successGreen : IosDesignSystem.errorRed,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -63,20 +66,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void _showDeleteConfirmation(TransactionModel tx) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      builder: (context) => CupertinoAlertDialog(
         title: const Text('Удаление транзакции'),
         content: Text('Вы уверены, что хотите удалить транзакцию "${tx.title}"?'),
         actions: [
-          TextButton(
+          CupertinoDialogAction(
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Отмена'),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF6B6B),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Удалить'),
           ),
@@ -91,10 +90,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(success ? 'Транзакция удалена' : 'Ошибка удаления'),
-            backgroundColor: success ? const Color(0xFF16C784) : const Color(0xFFFF6B6B),
+            backgroundColor: success ? IosDesignSystem.successGreen : IosDesignSystem.errorRed,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -178,16 +178,44 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
               )
             else
-              ...filtered.map((tx) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: TransactionItem(
-                    tx,
-                    onEdit: () => _showEditDialog(tx),
-                    onDelete: () => _showDeleteConfirmation(tx),
-                  ),
-                );
-              }),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return AnimatedList(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    initialItemCount: filtered.length,
+                    itemBuilder: (context, index, animation) {
+                      final tx = filtered[index];
+                      return SlideTransition(
+                        position: animation.drive(
+                          Tween(
+                            begin: const Offset(0, 0.3),
+                            end: Offset.zero,
+                          ).chain(CurveTween(curve: Curves.easeOutCubic)),
+                        ),
+                        child: FadeTransition(
+                          opacity: animation.drive(
+                            CurveTween(curve: Curves.easeInOut),
+                          ),
+                          child: SizeTransition(
+                            sizeFactor: animation.drive(
+                              CurveTween(curve: Curves.easeOutCubic),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: TransactionItem(
+                                tx,
+                                onEdit: () => _showEditDialog(tx),
+                                onDelete: () => _showDeleteConfirmation(tx),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
           ],
         ),
       ),

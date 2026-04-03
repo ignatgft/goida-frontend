@@ -52,14 +52,6 @@ class Endpoints {
   static const String avatars = "/avatars";
   static const String activeAvatar = "/avatars/active";
 
-  // Сообщения (мессенджер)
-  static const String messages = "/messages";
-  static const String conversations = "/messages/conversations";
-  static const String unreadMessages = "/messages/unread";
-
-  // Поиск пользователей
-  static const String usersSearch = "/users/search";
-
   // Уведомления
   static const String notifications = "/notifications";
 

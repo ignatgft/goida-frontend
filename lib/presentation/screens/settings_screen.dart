@@ -1,280 +1,384 @@
-import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme/ios_design_system.dart';
 import '../../l10n/app_localizations.dart';
-import '../providers/settings_provider.dart';
+import '../providers/app_settings_provider.dart';
 import '../providers/auth_provider.dart';
 import '../../data/models/user_settings.dart';
-import '../../data/models/balance.dart';
 
-/// Экран настроек в виде списка с модальными окнами
-class SettingsScreen extends StatefulWidget {
+/// Экран Настройки в едином стиле iOS Settings.app
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      context.read<SettingsProvider>().loadSettings();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final appSettings = context.watch<AppSettingsProvider>();
+    final authProvider = context.watch<AuthProvider>();
     final l10n = AppLocalizations.of(context)!;
 
+    final settings = appSettings.settings;
+    final profile = appSettings.profile;
+    final fullName = settings?.fullName ?? profile?.displayName ?? authProvider.displayName;
+    final email = settings?.email ?? profile?.email ?? authProvider.email;
+    final avatarUrl = settings?.avatarUrl ?? profile?.avatarUrl ?? authProvider.avatarUrl;
+
     return Scaffold(
+      backgroundColor: IosDesignSystem.getSystemGroupedBackground(context),
       appBar: AppBar(
         title: Text(l10n.settings),
+        backgroundColor: IosDesignSystem.getSystemBackground(context).withValues(alpha: 0.95),
+        elevation: 0,
+        foregroundColor: IosDesignSystem.getLabelPrimary(context),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            const SliverPadding(
+              padding: EdgeInsets.only(top: 20, bottom: 10),
+            ),
+
+            // Профиль карточка
+            SliverToBoxAdapter(
+              child: _buildProfileCard(context, fullName, email, avatarUrl, appSettings, l10n),
+            ),
+
+            const SliverPadding(
+              padding: EdgeInsets.only(bottom: IosDesignSystem.sectionSpacing),
+            ),
+
+            // USAGE & BILLING секция
+            _buildSection(
+              context: context,
+              header: l10n.usageAndBilling,
+              children: [
+                _buildListTile(
+                  context: context,
+                  icon: CupertinoIcons.creditcard,
+                  title: l10n.monthlyBudget,
+                  value: '\$${(settings?.monthlyBudget ?? 0).toStringAsFixed(2)}',
+                  onTap: () => _showBudgetDialog(context, appSettings, l10n),
+                ),
+                _buildListTile(
+                  context: context,
+                  icon: CupertinoIcons.doc_text,
+                  title: l10n.billingHistory,
+                  onTap: () {},
+                ),
+              ],
+            ),
+
+            const SliverPadding(
+              padding: EdgeInsets.only(bottom: IosDesignSystem.sectionSpacing),
+            ),
+
+            // APPEARANCE секция
+            _buildSection(
+              context: context,
+              header: l10n.appearanceSection,
+              children: [
+                _buildListTile(
+                  context: context,
+                  icon: CupertinoIcons.paintbrush,
+                  title: l10n.theme,
+                  value: _getThemeName(appSettings.appTheme, l10n),
+                  onTap: () => _showThemeDialog(context, appSettings, l10n),
+                ),
+                _buildListTile(
+                  context: context,
+                  icon: CupertinoIcons.globe,
+                  title: l10n.language,
+                  value: _getLanguageName(appSettings.appLanguage, l10n),
+                  onTap: () => _showLanguageDialog(context, appSettings, l10n),
+                ),
+              ],
+            ),
+
+            const SliverPadding(
+              padding: EdgeInsets.only(bottom: IosDesignSystem.sectionSpacing),
+            ),
+
+            // NOTIFICATIONS секция
+            _buildSection(
+              context: context,
+              header: l10n.notificationsSection,
+              children: [
+                _buildSwitchTile(
+                  context: context,
+                  icon: CupertinoIcons.mail,
+                  title: l10n.emailNotifications,
+                  value: settings?.emailNotifications ?? false,
+                  onChanged: (value) {
+                    appSettings.updateSettings(emailNotifications: value);
+                  },
+                ),
+                _buildSwitchTile(
+                  context: context,
+                  icon: CupertinoIcons.bell,
+                  title: l10n.pushNotifications,
+                  value: settings?.pushNotifications ?? true,
+                  onChanged: (value) {
+                    appSettings.updateSettings(pushNotifications: value);
+                  },
+                ),
+              ],
+            ),
+
+            const SliverPadding(
+              padding: EdgeInsets.only(bottom: IosDesignSystem.sectionSpacing),
+            ),
+
+            // SYSTEM секция
+            _buildSection(
+              context: context,
+              header: l10n.systemSection,
+              children: [
+                _buildListTile(
+                  context: context,
+                  icon: CupertinoIcons.info,
+                  title: l10n.about,
+                  value: l10n.appVersion,
+                  onTap: () => _showAboutDialog(context, l10n),
+                ),
+                _buildListTile(
+                  context: context,
+                  icon: CupertinoIcons.lock_shield,
+                  title: l10n.privacyPolicy,
+                  onTap: () {},
+                ),
+              ],
+            ),
+
+            const SliverPadding(
+              padding: EdgeInsets.only(bottom: 40),
+            ),
+
+            // Sign Out кнопка
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: IosDesignSystem.paddingMedium),
+                child: CupertinoButton(
+                  color: IosDesignSystem.errorRed,
+                  onPressed: () => _showSignOutDialog(context, authProvider, l10n),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text(
+                      l10n.signOut,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: IosDesignSystem.fontSizeBody,
+                        fontWeight: IosDesignSystem.weightSemibold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            const SliverPadding(
+              padding: EdgeInsets.only(bottom: 40),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileCard(
+    BuildContext context,
+    String fullName,
+    String email,
+    String? avatarUrl,
+    AppSettingsProvider appSettings,
+    AppLocalizations l10n,
+  ) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: IosDesignSystem.paddingMedium),
+      padding: const EdgeInsets.all(IosDesignSystem.paddingXLarge),
+      decoration: BoxDecoration(
+        color: IosDesignSystem.getSecondarySystemBackground(context),
+        borderRadius: BorderRadius.circular(IosDesignSystem.radiusXLarge),
+        border: Border.all(
+          color: IosDesignSystem.getSeparator(context).withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
         children: [
-          // Профиль
-          _SettingsSection(
-            title: l10n.profile,
-            children: [
-              _SettingsTile(
-                icon: Icons.person_outline_rounded,
-                title: l10n.fullName,
-                subtitle: context.watch<SettingsProvider>().settings?.fullName ??
-                    context.watch<AuthProvider>().profile?.displayName ??
-                    '',
-                onTap: () => _showProfileDialog(context),
-              ),
-              _SettingsTile(
-                icon: Icons.email_outlined,
-                title: l10n.email,
-                subtitle: context.watch<SettingsProvider>().settings?.email ??
-                    context.watch<AuthProvider>().profile?.email ??
-                    '',
-                enabled: false,
-              ),
-              _SettingsTile(
-                icon: Icons.account_balance_wallet_outlined,
-                title: l10n.baseCurrency,
-                subtitle: context.watch<SettingsProvider>().settings?.baseCurrency.code ??
-                    'USD',
-                onTap: () => _showCurrencyPicker(context),
-              ),
-              _SettingsTile(
-                icon: Icons.attach_money,
-                title: l10n.monthlyBudget,
-                subtitle: context.watch<SettingsProvider>().settings?.monthlyBudget.toString() ??
-                    '0',
-                onTap: () => _showBudgetDialog(context),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Внешний вид
-          _SettingsSection(
-            title: l10n.appearance,
-            children: [
-              _SettingsTile(
-                icon: Icons.palette_outlined,
-                title: l10n.theme,
-                subtitle: _getThemeName(
-                  context.watch<SettingsProvider>().settings?.theme ?? 'system',
-                  l10n,
+          GestureDetector(
+            onTap: () => _showAvatarOptions(context, appSettings, l10n),
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    IosDesignSystem.primaryAccent,
+                    IosDesignSystem.successGreen,
+                  ],
                 ),
-                onTap: () => _showThemeDialog(context),
-              ),
-              _SettingsTile(
-                icon: Icons.language_rounded,
-                title: l10n.language,
-                subtitle: _getLanguageName(
-                  context.watch<SettingsProvider>().settings?.language ?? 'ru',
-                  l10n,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: IosDesignSystem.getLabelPrimary(context),
+                  width: 3,
                 ),
-                onTap: () => _showLanguageDialog(context),
               ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Уведомления
-          _SettingsSection(
-            title: l10n.notifications,
-            children: [
-              _SettingsSwitchTile(
-                icon: Icons.notifications_outlined,
-                title: l10n.enableNotifications,
-                value: context.watch<SettingsProvider>().settings?.notificationsEnabled ?? true,
-                onChanged: (value) {
-                  context.read<SettingsProvider>().updateSettings(notificationsEnabled: value);
-                },
-              ),
-              _SettingsSwitchTile(
-                icon: Icons.email_outlined,
-                title: l10n.emailNotifications,
-                value: context.watch<SettingsProvider>().settings?.emailNotifications ?? false,
-                onChanged: (value) {
-                  context.read<SettingsProvider>().updateSettings(emailNotifications: value);
-                },
-              ),
-              _SettingsSwitchTile(
-                icon: Icons.phone_android_rounded,
-                title: l10n.pushNotifications,
-                value: context.watch<SettingsProvider>().settings?.pushNotifications ?? true,
-                onChanged: (value) {
-                  context.read<SettingsProvider>().updateSettings(pushNotifications: value);
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // О приложении
-          _SettingsSection(
-            title: l10n.about,
-            children: [
-              _SettingsTile(
-                icon: Icons.info_outline_rounded,
-                title: l10n.about,
-                subtitle: l10n.appVersion,
-                onTap: () => _showAboutDialog(context),
-              ),
-            ],
-          ),
-          const SizedBox(height: 32),
-
-          // Выход
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {
-                context.read<AuthProvider>().signOut();
-              },
-              icon: const Icon(Icons.logout_rounded),
-              label: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text(l10n.logout),
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.red,
-              ),
+              child: const Icon(CupertinoIcons.person, color: Colors.white, size: 50),
             ),
           ),
           const SizedBox(height: 16),
-        ],
-      ),
-    );
-  }
-
-  String _getThemeName(String theme, AppLocalizations l10n) {
-    switch (theme.toLowerCase()) {
-      case 'light':
-        return l10n.light;
-      case 'dark':
-        return l10n.dark;
-      default:
-        return l10n.system;
-    }
-  }
-
-  String _getLanguageName(String language, AppLocalizations l10n) {
-    switch (language.toLowerCase()) {
-      case 'en':
-        return 'English';
-      case 'ru':
-        return 'Русский';
-      default:
-        return 'Русский';
-    }
-  }
-
-  void _showProfileDialog(BuildContext context) {
-    final provider = context.read<SettingsProvider>();
-    final settings = provider.settings;
-    final l10n = AppLocalizations.of(context)!;
-    final controller = TextEditingController(text: settings?.fullName ?? '');
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.fullName),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: l10n.fullName,
-            border: const OutlineInputBorder(),
+          Text(
+            fullName,
+            style: TextStyle(
+              color: IosDesignSystem.getLabelPrimary(context),
+              fontSize: IosDesignSystem.fontSizeTitle3,
+              fontWeight: IosDesignSystem.weightBold,
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
+          const SizedBox(height: 4),
+          Text(
+            email,
+            style: TextStyle(
+              color: IosDesignSystem.getLabelSecondary(context),
+              fontSize: IosDesignSystem.fontSizeSubheadline,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          FilledButton(
-            onPressed: () {
-              provider.updateSettings(fullName: controller.text.trim());
-              Navigator.pop(context);
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showCurrencyPicker(BuildContext context) {
-    final provider = context.read<SettingsProvider>();
-    final settings = provider.settings;
-    final l10n = AppLocalizations.of(context)!;
-
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                l10n.baseCurrency,
-                style: Theme.of(context).textTheme.titleLarge,
+          const SizedBox(height: 12),
+          CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => _showEditProfileDialog(context, appSettings, l10n),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              decoration: BoxDecoration(
+                color: IosDesignSystem.primaryAccent.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(IosDesignSystem.radiusMedium),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    CupertinoIcons.pencil,
+                    color: IosDesignSystem.primaryAccent,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.editProfile,
+                    style: const TextStyle(
+                      color: IosDesignSystem.primaryAccent,
+                      fontSize: IosDesignSystem.fontSizeFootnote,
+                      fontWeight: IosDesignSystem.weightSemibold,
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(
-              height: 300,
-              child: ListView.builder(
-                itemCount: SupportedCurrencyX.fiatValues.length,
-                itemBuilder: (context, index) {
-                  final currency = SupportedCurrencyX.fiatValues[index];
-                  final isSelected = settings?.baseCurrency.code == currency.code;
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: isSelected
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey.shade300,
-                      child: Text(
-                        currency.code,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: isSelected ? Colors.white : Colors.black,
-                        ),
-                      ),
-                    ),
-                    title: Text('${currency.code} - ${currency.symbol}'),
-                    trailing: isSelected
-                        ? Icon(Icons.check, color: Theme.of(context).primaryColor)
-                        : null,
-                    onTap: () {
-                      provider.changeBaseCurrency(currency);
-                      Navigator.pop(context);
-                    },
-                  );
-                },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSection({
+    required BuildContext context,
+    required String header,
+    required List<Widget> children,
+  }) {
+    return SliverList(
+      delegate: SliverChildListDelegate([
+        Padding(
+          padding: const EdgeInsets.only(
+            left: IosDesignSystem.paddingMedium,
+            bottom: IosDesignSystem.paddingSmall,
+          ),
+          child: Text(
+            header,
+            style: TextStyle(
+              color: IosDesignSystem.getLabelSecondary(context),
+              fontSize: IosDesignSystem.fontSizeFootnote,
+              fontWeight: IosDesignSystem.weightSemibold,
+            ),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: IosDesignSystem.paddingMedium),
+          decoration: BoxDecoration(
+            color: IosDesignSystem.getSecondarySystemBackground(context),
+            borderRadius: BorderRadius.circular(IosDesignSystem.radiusMedium),
+            border: Border.all(
+              color: IosDesignSystem.getSeparator(context).withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            children: children,
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget _buildListTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    String? value,
+    VoidCallback? onTap,
+  }) {
+    return CupertinoButton(
+      onPressed: onTap,
+      padding: EdgeInsets.zero,
+      child: Container(
+        padding: const EdgeInsets.all(IosDesignSystem.paddingMedium),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: IosDesignSystem.getSeparator(context),
+              width: 0.5,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: IosDesignSystem.primaryAccent.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(IosDesignSystem.radiusSmall),
               ),
+              child: Icon(
+                icon,
+                color: IosDesignSystem.primaryAccent,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: IosDesignSystem.getLabelPrimary(context),
+                  fontSize: IosDesignSystem.fontSizeBody,
+                ),
+              ),
+            ),
+            if (value != null) ...[
+              Text(
+                value,
+                style: TextStyle(
+                  color: IosDesignSystem.getLabelSecondary(context),
+                  fontSize: IosDesignSystem.fontSizeSubheadline,
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
+            Icon(
+              CupertinoIcons.chevron_right,
+              color: IosDesignSystem.getLabelTertiary(context),
+              size: 20,
             ),
           ],
         ),
@@ -282,242 +386,411 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showBudgetDialog(BuildContext context) {
-    final provider = context.read<SettingsProvider>();
-    final settings = provider.settings;
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildSwitchTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(IosDesignSystem.paddingMedium),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: IosDesignSystem.getSeparator(context),
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: IosDesignSystem.primaryAccent.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(IosDesignSystem.radiusSmall),
+            ),
+            child: Icon(
+              icon,
+              color: IosDesignSystem.primaryAccent,
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                color: IosDesignSystem.getLabelPrimary(context),
+                fontSize: IosDesignSystem.fontSizeBody,
+              ),
+            ),
+          ),
+          CupertinoSwitch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: IosDesignSystem.primaryAccent,
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getThemeName(AppTheme theme, AppLocalizations l10n) {
+    switch (theme) {
+      case AppTheme.light:
+        return l10n.lightMode;
+      case AppTheme.dark:
+        return l10n.darkMode;
+      case AppTheme.system:
+        return l10n.systemMode;
+    }
+  }
+
+  String _getLanguageName(AppLanguage language, AppLocalizations l10n) {
+    switch (language) {
+      case AppLanguage.russian:
+        return l10n.russian;
+      case AppLanguage.english:
+        return l10n.english;
+    }
+  }
+
+  void _showAvatarOptions(BuildContext context, AppSettingsProvider appSettings, AppLocalizations l10n) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: Text(l10n.changeAvatar, style: const TextStyle(fontWeight: FontWeight.w600)),
+        actions: [
+          CupertinoActionSheetAction(
+            child: Text(l10n.chooseFromGallery),
+            onPressed: () {
+              Navigator.pop(context);
+              appSettings.pickAndUploadAvatar();
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: Text(l10n.deleteAvatar, style: const TextStyle(color: Colors.red)),
+            onPressed: () {
+              Navigator.pop(context);
+              appSettings.deleteAvatar();
+            },
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          child: Text(l10n.cancel),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+    );
+  }
+
+  void _showThemeDialog(BuildContext context, AppSettingsProvider appSettings, AppLocalizations l10n) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: Text(l10n.themeDialogTitle, style: const TextStyle(fontWeight: FontWeight.w600)),
+        actions: [
+          CupertinoActionSheetAction(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.light_mode_rounded,
+                  color: appSettings.appTheme == AppTheme.light 
+                    ? IosDesignSystem.primaryAccent 
+                    : IosDesignSystem.getLabelSecondary(context),
+                ),
+                const SizedBox(width: 12),
+                Text(l10n.lightMode),
+                if (appSettings.appTheme == AppTheme.light) ...[
+                  const Spacer(),
+                  Icon(
+                    CupertinoIcons.check_mark,
+                    color: IosDesignSystem.primaryAccent,
+                  ),
+                ],
+              ],
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              appSettings.changeTheme(AppTheme.light);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.dark_mode_rounded,
+                  color: appSettings.appTheme == AppTheme.dark 
+                    ? IosDesignSystem.primaryAccent 
+                    : IosDesignSystem.getLabelSecondary(context),
+                ),
+                const SizedBox(width: 12),
+                Text(l10n.darkMode),
+                if (appSettings.appTheme == AppTheme.dark) ...[
+                  const Spacer(),
+                  Icon(
+                    CupertinoIcons.check_mark,
+                    color: IosDesignSystem.primaryAccent,
+                  ),
+                ],
+              ],
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              appSettings.changeTheme(AppTheme.dark);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.phone_android_rounded,
+                  color: appSettings.appTheme == AppTheme.system 
+                    ? IosDesignSystem.primaryAccent 
+                    : IosDesignSystem.getLabelSecondary(context),
+                ),
+                const SizedBox(width: 12),
+                Text(l10n.systemMode),
+                if (appSettings.appTheme == AppTheme.system) ...[
+                  const Spacer(),
+                  Icon(
+                    CupertinoIcons.check_mark,
+                    color: IosDesignSystem.primaryAccent,
+                  ),
+                ],
+              ],
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              appSettings.changeTheme(AppTheme.system);
+            },
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          child: Text(l10n.cancel),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+    );
+  }
+
+  void _showLanguageDialog(BuildContext context, AppSettingsProvider appSettings, AppLocalizations l10n) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: Text(l10n.languageDialogTitle, style: const TextStyle(fontWeight: FontWeight.w600)),
+        actions: [
+          CupertinoActionSheetAction(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.language_rounded,
+                  color: appSettings.appLanguage == AppLanguage.russian 
+                    ? IosDesignSystem.primaryAccent 
+                    : IosDesignSystem.getLabelSecondary(context),
+                ),
+                const SizedBox(width: 12),
+                Text(l10n.russian),
+                if (appSettings.appLanguage == AppLanguage.russian) ...[
+                  const Spacer(),
+                  Icon(
+                    CupertinoIcons.check_mark,
+                    color: IosDesignSystem.primaryAccent,
+                  ),
+                ],
+              ],
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              appSettings.changeLanguage(AppLanguage.russian);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.translate_rounded,
+                  color: appSettings.appLanguage == AppLanguage.english 
+                    ? IosDesignSystem.primaryAccent 
+                    : IosDesignSystem.getLabelSecondary(context),
+                ),
+                const SizedBox(width: 12),
+                Text(l10n.english),
+                if (appSettings.appLanguage == AppLanguage.english) ...[
+                  const Spacer(),
+                  Icon(
+                    CupertinoIcons.check_mark,
+                    color: IosDesignSystem.primaryAccent,
+                  ),
+                ],
+              ],
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              appSettings.changeLanguage(AppLanguage.english);
+            },
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          child: Text(l10n.cancel),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+    );
+  }
+
+  void _showBudgetDialog(BuildContext context, AppSettingsProvider appSettings, AppLocalizations l10n) {
     final controller = TextEditingController(
-      text: settings?.monthlyBudget.toString() ?? '0',
+      text: (appSettings.settings?.monthlyBudget ?? 0).toString(),
     );
 
-    showDialog(
+    showCupertinoDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.monthlyBudget),
-        content: TextField(
-          controller: controller,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
-            labelText: l10n.monthlyBudget,
-            prefixText: '${settings?.baseCurrency.symbol ?? '\$'} ',
-            border: const OutlineInputBorder(),
+      builder: (context) => CupertinoAlertDialog(
+        title: Text(l10n.budgetDialogTitle),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: CupertinoTextField(
+            controller: controller,
+            placeholder: l10n.enterBudget,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: IosDesignSystem.getSystemBackground(context),
+              borderRadius: BorderRadius.circular(IosDesignSystem.radiusSmall),
+              border: Border.all(
+                color: IosDesignSystem.getSeparator(context),
+              ),
+            ),
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
+          CupertinoDialogAction(
             child: Text(l10n.cancel),
+            onPressed: () => Navigator.pop(context),
           ),
-          FilledButton(
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            child: Text(l10n.save),
             onPressed: () {
-              final budget = double.tryParse(controller.text.replaceAll(',', '.'));
-              if (budget != null) {
-                provider.updateSettings(monthlyBudget: budget);
+              final budget = double.tryParse(controller.text) ?? 0.0;
+              appSettings.updateSettings(monthlyBudget: budget);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditProfileDialog(BuildContext context, AppSettingsProvider appSettings, AppLocalizations l10n) {
+    final controller = TextEditingController(
+      text: appSettings.settings?.fullName ?? appSettings.displayName,
+    );
+
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text(l10n.editProfile),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: CupertinoTextField(
+            controller: controller,
+            placeholder: l10n.enterFullName,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: IosDesignSystem.getSystemBackground(context),
+              borderRadius: BorderRadius.circular(IosDesignSystem.radiusSmall),
+              border: Border.all(
+                color: IosDesignSystem.getSeparator(context),
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: Text(l10n.cancel),
+            onPressed: () => Navigator.pop(context),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            child: Text(l10n.save),
+            onPressed: () {
+              final name = controller.text.trim();
+              if (name.isNotEmpty) {
+                appSettings.updateSettings(fullName: name);
               }
               Navigator.pop(context);
             },
-            child: const Text('Save'),
           ),
         ],
       ),
     );
   }
 
-  void _showThemeDialog(BuildContext context) {
-    final provider = context.read<SettingsProvider>();
-    final settings = provider.settings;
-    final l10n = AppLocalizations.of(context)!;
-    final currentTheme = AppThemeX.fromString(settings?.theme ?? 'system');
-
-    showModalBottomSheet(
+  void _showAboutDialog(BuildContext context, AppLocalizations l10n) {
+    showCupertinoDialog(
       context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                l10n.theme,
-                style: Theme.of(context).textTheme.titleLarge,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text(l10n.aboutDialogTitle),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${l10n.version} ${l10n.appVersion}',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: IosDesignSystem.getLabelPrimary(context),
+                ),
               ),
-            ),
-            ...AppTheme.values.map((theme) => RadioListTile<AppTheme>(
-              value: theme,
-              groupValue: currentTheme,
-              title: Text(theme.displayName),
-              secondary: Icon(theme.icon),
-              onChanged: (value) {
-                if (value != null) {
-                  provider.changeTheme(value);
-                  Navigator.pop(context);
-                }
-              },
-            )),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showLanguageDialog(BuildContext context) {
-    final provider = context.read<SettingsProvider>();
-    final settings = provider.settings;
-    final l10n = AppLocalizations.of(context)!;
-    final currentLanguage = AppLanguageX.fromCode(settings?.language ?? 'ru');
-
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                l10n.language,
-                style: Theme.of(context).textTheme.titleLarge,
+              const SizedBox(height: 12),
+              Text(
+                l10n.appDescriptionFull,
+                style: TextStyle(
+                  color: IosDesignSystem.getLabelSecondary(context),
+                ),
               ),
-            ),
-            ...AppLanguage.values.map((language) => RadioListTile<AppLanguage>(
-              value: language,
-              groupValue: currentLanguage,
-              title: Text(language.displayName),
-              secondary: Icon(language.icon),
-              onChanged: (value) {
-                if (value != null) {
-                  provider.changeLanguage(value);
-                  Navigator.pop(context);
-                }
-              },
-            )),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showAboutDialog(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.about),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(l10n.appDescription),
-            const SizedBox(height: 16),
-            Text(l10n.appFeatures),
-          ],
+            ],
+          ),
         ),
         actions: [
-          TextButton(
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            child: Text(l10n.done),
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
           ),
         ],
       ),
     );
   }
-}
 
-/// Секция настроек
-class _SettingsSection extends StatelessWidget {
-  final String title;
-  final List<Widget> children;
-
-  const _SettingsSection({required this.title, required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.dividerColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Text(
-              title,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+  void _showSignOutDialog(BuildContext context, AuthProvider authProvider, AppLocalizations l10n) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text(l10n.signOut),
+        content: Text(l10n.signOutConfirm),
+        actions: [
+          CupertinoDialogAction(
+            child: Text(l10n.cancel),
+            onPressed: () => Navigator.pop(context),
           ),
-          const Divider(height: 1),
-          ...children,
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: Text(l10n.signOut),
+            onPressed: () {
+              Navigator.pop(context);
+              authProvider.signOut();
+            },
+          ),
         ],
       ),
-    );
-  }
-}
-
-/// Элемент списка настроек
-class _SettingsTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String? subtitle;
-  final bool enabled;
-  final VoidCallback? onTap;
-
-  const _SettingsTile({
-    required this.icon,
-    required this.title,
-    this.subtitle,
-    this.enabled = true,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return ListTile(
-      leading: Icon(icon, color: theme.colorScheme.primary),
-      title: Text(title),
-      subtitle: subtitle != null ? Text(subtitle!) : null,
-      trailing: enabled
-          ? Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurface.withOpacity(0.3))
-          : null,
-      enabled: enabled,
-      onTap: onTap,
-    );
-  }
-}
-
-/// Переключатель настроек
-class _SettingsSwitchTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  const _SettingsSwitchTile({
-    required this.icon,
-    required this.title,
-    required this.value,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return SwitchListTile(
-      secondary: Icon(icon, color: theme.colorScheme.primary),
-      title: Text(title),
-      value: value,
-      onChanged: onChanged,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
     );
   }
 }

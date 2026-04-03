@@ -422,6 +422,12 @@ abstract class AppLocalizations {
   /// **'Asset synced with backend'**
   String get assetSaved;
 
+  /// No description provided for @quickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quickActions;
+
   /// No description provided for @assetSavedLocally.
   ///
   /// In en, this message translates to:
@@ -761,7 +767,7 @@ abstract class AppLocalizations {
   /// No description provided for @appVersion.
   ///
   /// In en, this message translates to:
-  /// **'Version 0.1.0'**
+  /// **'Version 0.2.0'**
   String get appVersion;
 
   /// No description provided for @appDescription.
@@ -799,54 +805,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete Avatar'**
   String get deleteAvatar;
-
-  /// No description provided for @messenger.
-  ///
-  /// In en, this message translates to:
-  /// **'Messenger'**
-  String get messenger;
-
-  /// No description provided for @messages.
-  ///
-  /// In en, this message translates to:
-  /// **'Messages'**
-  String get messages;
-
-  /// No description provided for @conversations.
-  ///
-  /// In en, this message translates to:
-  /// **'Conversations'**
-  String get conversations;
-
-  /// No description provided for @unreadMessages.
-  ///
-  /// In en, this message translates to:
-  /// **'Unread Messages'**
-  String get unreadMessages;
-
-  /// No description provided for @sendMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Send Message'**
-  String get sendMessage;
-
-  /// No description provided for @typeMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Type a message...'**
-  String get typeMessage;
-
-  /// No description provided for @attachFile.
-  ///
-  /// In en, this message translates to:
-  /// **'Attach File'**
-  String get attachFile;
-
-  /// No description provided for @attachImage.
-  ///
-  /// In en, this message translates to:
-  /// **'Attach Image'**
-  String get attachImage;
 
   /// No description provided for @analyzeDocument.
   ///
@@ -943,6 +901,420 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AI Assistant'**
   String get aiAssistant;
+
+  /// No description provided for @usageAndBilling.
+  ///
+  /// In en, this message translates to:
+  /// **'USAGE & BILLING'**
+  String get usageAndBilling;
+
+  /// No description provided for @billingHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Billing History'**
+  String get billingHistory;
+
+  /// No description provided for @seeThirdParty.
+  ///
+  /// In en, this message translates to:
+  /// **'See third-party to prevent unexpected charges from API usage'**
+  String get seeThirdParty;
+
+  /// No description provided for @appearanceSection.
+  ///
+  /// In en, this message translates to:
+  /// **'APPEARANCE'**
+  String get appearanceSection;
+
+  /// No description provided for @notificationsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'NOTIFICATIONS'**
+  String get notificationsSection;
+
+  /// No description provided for @systemSection.
+  ///
+  /// In en, this message translates to:
+  /// **'SYSTEM'**
+  String get systemSection;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @signOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get signOut;
+
+  /// No description provided for @signOutConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to sign out?'**
+  String get signOutConfirm;
+
+  /// No description provided for @walletConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Wallet'**
+  String get walletConnect;
+
+  /// No description provided for @connectWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get connectWallet;
+
+  /// No description provided for @disconnectWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get disconnectWallet;
+
+  /// No description provided for @walletConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet Connected'**
+  String get walletConnected;
+
+  /// No description provided for @walletDisconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet Disconnected'**
+  String get walletDisconnected;
+
+  /// No description provided for @selectWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Wallet'**
+  String get selectWallet;
+
+  /// No description provided for @scanQRCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR Code'**
+  String get scanQRCode;
+
+  /// No description provided for @qrCodeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Point your camera at the wallet QR code'**
+  String get qrCodeDescription;
+
+  /// No description provided for @tonkeeper.
+  ///
+  /// In en, this message translates to:
+  /// **'Tonkeeper'**
+  String get tonkeeper;
+
+  /// No description provided for @metamask.
+  ///
+  /// In en, this message translates to:
+  /// **'MetaMask'**
+  String get metamask;
+
+  /// No description provided for @trustWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Trust Wallet'**
+  String get trustWallet;
+
+  /// No description provided for @phantom.
+  ///
+  /// In en, this message translates to:
+  /// **'Phantom'**
+  String get phantom;
+
+  /// No description provided for @rainbow.
+  ///
+  /// In en, this message translates to:
+  /// **'Rainbow'**
+  String get rainbow;
+
+  /// No description provided for @argent.
+  ///
+  /// In en, this message translates to:
+  /// **'Argent'**
+  String get argent;
+
+  /// No description provided for @braavos.
+  ///
+  /// In en, this message translates to:
+  /// **'Braavos'**
+  String get braavos;
+
+  /// No description provided for @coinbaseWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Coinbase Wallet'**
+  String get coinbaseWallet;
+
+  /// No description provided for @ledger.
+  ///
+  /// In en, this message translates to:
+  /// **'Ledger'**
+  String get ledger;
+
+  /// No description provided for @safePal.
+  ///
+  /// In en, this message translates to:
+  /// **'SafePal'**
+  String get safePal;
+
+  /// No description provided for @imToken.
+  ///
+  /// In en, this message translates to:
+  /// **'imToken'**
+  String get imToken;
+
+  /// No description provided for @systemDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'System Default'**
+  String get systemDefault;
+
+  /// No description provided for @budgetDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Budget'**
+  String get budgetDialogTitle;
+
+  /// No description provided for @enterBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter budget amount'**
+  String get enterBudget;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @budgetUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget updated'**
+  String get budgetUpdated;
+
+  /// No description provided for @languageDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageDialogTitle;
+
+  /// No description provided for @themeDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeDialogTitle;
+
+  /// No description provided for @russian.
+  ///
+  /// In en, this message translates to:
+  /// **'Русский'**
+  String get russian;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @lightMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get lightMode;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get darkMode;
+
+  /// No description provided for @systemMode.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get systemMode;
+
+  /// No description provided for @aboutDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About Goida AI'**
+  String get aboutDialogTitle;
+
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// No description provided for @buildNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Build 0.2.0'**
+  String get buildNumber;
+
+  /// No description provided for @appDescriptionFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Goida AI is a personal finance management application with AI integration.\n\nFeatures:\n• Asset and transaction tracking\n• Expense analysis\n• AI assistant\n• Receipt scanning\n• Notifications and reminders\n• Multi-currency support\n• WalletConnect integration'**
+  String get appDescriptionFull;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @profileUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated'**
+  String get profileUpdated;
+
+  /// No description provided for @enterFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter full name'**
+  String get enterFullName;
+
+  /// No description provided for @nameUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Name updated'**
+  String get nameUpdated;
+
+  /// No description provided for @attachPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach Photo'**
+  String get attachPhoto;
+
+  /// No description provided for @attachFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach File'**
+  String get attachFile;
+
+  /// No description provided for @clearChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Chat'**
+  String get clearChat;
+
+  /// No description provided for @clearChatConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear the chat history?'**
+  String get clearChatConfirm;
+
+  /// No description provided for @chatCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat history cleared'**
+  String get chatCleared;
+
+  /// No description provided for @startConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a conversation with AI'**
+  String get startConversation;
+
+  /// No description provided for @aiTyping.
+  ///
+  /// In en, this message translates to:
+  /// **'AI is typing...'**
+  String get aiTyping;
+
+  /// No description provided for @messageError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send message'**
+  String get messageError;
+
+  /// No description provided for @image.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get image;
+
+  /// No description provided for @file.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get file;
+
+  /// No description provided for @selectSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Source'**
+  String get selectSource;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// No description provided for @fileManager.
+  ///
+  /// In en, this message translates to:
+  /// **'File Manager'**
+  String get fileManager;
+
+  /// No description provided for @document.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get document;
+
+  /// No description provided for @analyzeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze Image'**
+  String get analyzeImage;
+
+  /// No description provided for @uploadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded successfully'**
+  String get uploadSuccess;
+
+  /// No description provided for @uploadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed'**
+  String get uploadError;
+
+  /// No description provided for @fileSizeTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'File size is too large'**
+  String get fileSizeTooLarge;
+
+  /// No description provided for @maxFileSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum file size: 10MB'**
+  String get maxFileSize;
 }
 
 class _AppLocalizationsDelegate

@@ -256,10 +256,12 @@ class ChatProvider extends ChangeNotifier {
             ),
           );
           _messages.add(botMessage);
-          
+
           if (_chatId == null || !_chatId!.contains(data['chatId'])) {
             _chatId = data['chatId'] as String;
           }
+          
+          notifyListeners();
         }
       }
     } catch (e) {

@@ -175,6 +175,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assetSaved => 'Asset synced with backend';
 
   @override
+  String get quickActions => 'Quick Actions';
+
+  @override
   String get assetSavedLocally => 'Asset saved locally for now';
 
   @override
@@ -345,7 +348,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about => 'About';
 
   @override
-  String get appVersion => 'Version 0.1.0';
+  String get appVersion => 'Version 0.2.0';
 
   @override
   String get appDescription =>
@@ -366,30 +369,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAvatar => 'Delete Avatar';
-
-  @override
-  String get messenger => 'Messenger';
-
-  @override
-  String get messages => 'Messages';
-
-  @override
-  String get conversations => 'Conversations';
-
-  @override
-  String get unreadMessages => 'Unread Messages';
-
-  @override
-  String get sendMessage => 'Send Message';
-
-  @override
-  String get typeMessage => 'Type a message...';
-
-  @override
-  String get attachFile => 'Attach File';
-
-  @override
-  String get attachImage => 'Attach Image';
 
   @override
   String get analyzeDocument => 'Analyze Document';
@@ -438,4 +417,214 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiAssistant => 'AI Assistant';
+
+  @override
+  String get usageAndBilling => 'USAGE & BILLING';
+
+  @override
+  String get billingHistory => 'Billing History';
+
+  @override
+  String get seeThirdParty =>
+      'See third-party to prevent unexpected charges from API usage';
+
+  @override
+  String get appearanceSection => 'APPEARANCE';
+
+  @override
+  String get notificationsSection => 'NOTIFICATIONS';
+
+  @override
+  String get systemSection => 'SYSTEM';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get signOut => 'Sign Out';
+
+  @override
+  String get signOutConfirm => 'Are you sure you want to sign out?';
+
+  @override
+  String get walletConnect => 'Connect Wallet';
+
+  @override
+  String get connectWallet => 'Connect';
+
+  @override
+  String get disconnectWallet => 'Disconnect';
+
+  @override
+  String get walletConnected => 'Wallet Connected';
+
+  @override
+  String get walletDisconnected => 'Wallet Disconnected';
+
+  @override
+  String get selectWallet => 'Select Wallet';
+
+  @override
+  String get scanQRCode => 'Scan QR Code';
+
+  @override
+  String get qrCodeDescription => 'Point your camera at the wallet QR code';
+
+  @override
+  String get tonkeeper => 'Tonkeeper';
+
+  @override
+  String get metamask => 'MetaMask';
+
+  @override
+  String get trustWallet => 'Trust Wallet';
+
+  @override
+  String get phantom => 'Phantom';
+
+  @override
+  String get rainbow => 'Rainbow';
+
+  @override
+  String get argent => 'Argent';
+
+  @override
+  String get braavos => 'Braavos';
+
+  @override
+  String get coinbaseWallet => 'Coinbase Wallet';
+
+  @override
+  String get ledger => 'Ledger';
+
+  @override
+  String get safePal => 'SafePal';
+
+  @override
+  String get imToken => 'imToken';
+
+  @override
+  String get systemDefault => 'System Default';
+
+  @override
+  String get budgetDialogTitle => 'Monthly Budget';
+
+  @override
+  String get enterBudget => 'Enter budget amount';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get budgetUpdated => 'Budget updated';
+
+  @override
+  String get languageDialogTitle => 'Language';
+
+  @override
+  String get themeDialogTitle => 'Theme';
+
+  @override
+  String get russian => 'Русский';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get lightMode => 'Light';
+
+  @override
+  String get darkMode => 'Dark';
+
+  @override
+  String get systemMode => 'System';
+
+  @override
+  String get aboutDialogTitle => 'About Goida AI';
+
+  @override
+  String get version => 'Version';
+
+  @override
+  String get buildNumber => 'Build 0.2.0';
+
+  @override
+  String get appDescriptionFull =>
+      'Goida AI is a personal finance management application with AI integration.\n\nFeatures:\n• Asset and transaction tracking\n• Expense analysis\n• AI assistant\n• Receipt scanning\n• Notifications and reminders\n• Multi-currency support\n• WalletConnect integration';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get profileUpdated => 'Profile updated';
+
+  @override
+  String get enterFullName => 'Enter full name';
+
+  @override
+  String get nameUpdated => 'Name updated';
+
+  @override
+  String get attachPhoto => 'Attach Photo';
+
+  @override
+  String get attachFile => 'Attach File';
+
+  @override
+  String get clearChat => 'Clear Chat';
+
+  @override
+  String get clearChatConfirm =>
+      'Are you sure you want to clear the chat history?';
+
+  @override
+  String get chatCleared => 'Chat history cleared';
+
+  @override
+  String get startConversation => 'Start a conversation with AI';
+
+  @override
+  String get aiTyping => 'AI is typing...';
+
+  @override
+  String get messageError => 'Failed to send message';
+
+  @override
+  String get image => 'Image';
+
+  @override
+  String get file => 'File';
+
+  @override
+  String get selectSource => 'Select Source';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get fileManager => 'File Manager';
+
+  @override
+  String get document => 'Document';
+
+  @override
+  String get analyzeImage => 'Analyze Image';
+
+  @override
+  String get uploadSuccess => 'Uploaded successfully';
+
+  @override
+  String get uploadError => 'Upload failed';
+
+  @override
+  String get fileSizeTooLarge => 'File size is too large';
+
+  @override
+  String get maxFileSize => 'Maximum file size: 10MB';
 }

@@ -175,6 +175,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get assetSaved => 'Актив синхронизирован с бэкендом';
 
   @override
+  String get quickActions => 'Быстрые действия';
+
+  @override
   String get assetSavedLocally => 'Актив пока сохранен локально';
 
   @override
@@ -345,7 +348,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get about => 'О приложении';
 
   @override
-  String get appVersion => 'Версия 0.1.0';
+  String get appVersion => 'Версия 0.2.0';
 
   @override
   String get appDescription =>
@@ -366,30 +369,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deleteAvatar => 'Удалить аватар';
-
-  @override
-  String get messenger => 'Мессенджер';
-
-  @override
-  String get messages => 'Сообщения';
-
-  @override
-  String get conversations => 'Диалоги';
-
-  @override
-  String get unreadMessages => 'Непрочитанные сообщения';
-
-  @override
-  String get sendMessage => 'Отправить сообщение';
-
-  @override
-  String get typeMessage => 'Введите сообщение...';
-
-  @override
-  String get attachFile => 'Прикрепить файл';
-
-  @override
-  String get attachImage => 'Прикрепить изображение';
 
   @override
   String get analyzeDocument => 'Анализ документа';
@@ -438,4 +417,213 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get aiAssistant => 'ИИ Ассистент';
+
+  @override
+  String get usageAndBilling => 'USAGE & BILLING';
+
+  @override
+  String get billingHistory => 'История платежей';
+
+  @override
+  String get seeThirdParty => 'Сторонние списания';
+
+  @override
+  String get appearanceSection => 'APPEARANCE';
+
+  @override
+  String get notificationsSection => 'NOTIFICATIONS';
+
+  @override
+  String get systemSection => 'SYSTEM';
+
+  @override
+  String get privacyPolicy => 'Политика конфиденциальности';
+
+  @override
+  String get signOut => 'Выйти';
+
+  @override
+  String get signOutConfirm => 'Вы уверены, что хотите выйти?';
+
+  @override
+  String get walletConnect => 'Подключить кошелёк';
+
+  @override
+  String get connectWallet => 'Подключить';
+
+  @override
+  String get disconnectWallet => 'Отключить';
+
+  @override
+  String get walletConnected => 'Кошелёк подключён';
+
+  @override
+  String get walletDisconnected => 'Кошелёк отключён';
+
+  @override
+  String get selectWallet => 'Выберите кошелёк';
+
+  @override
+  String get scanQRCode => 'Отсканируйте QR-код';
+
+  @override
+  String get qrCodeDescription => 'Наведите камеру на QR-код кошелька';
+
+  @override
+  String get tonkeeper => 'Tonkeeper';
+
+  @override
+  String get metamask => 'MetaMask';
+
+  @override
+  String get trustWallet => 'Trust Wallet';
+
+  @override
+  String get phantom => 'Phantom';
+
+  @override
+  String get rainbow => 'Rainbow';
+
+  @override
+  String get argent => 'Argent';
+
+  @override
+  String get braavos => 'Braavos';
+
+  @override
+  String get coinbaseWallet => 'Coinbase Wallet';
+
+  @override
+  String get ledger => 'Ledger';
+
+  @override
+  String get safePal => 'SafePal';
+
+  @override
+  String get imToken => 'imToken';
+
+  @override
+  String get systemDefault => 'Системная';
+
+  @override
+  String get budgetDialogTitle => 'Месячный бюджет';
+
+  @override
+  String get enterBudget => 'Введите сумму бюджета';
+
+  @override
+  String get save => 'Сохранить';
+
+  @override
+  String get budgetUpdated => 'Бюджет обновлен';
+
+  @override
+  String get languageDialogTitle => 'Язык';
+
+  @override
+  String get themeDialogTitle => 'Тема';
+
+  @override
+  String get russian => 'Русский';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get lightMode => 'Светлая';
+
+  @override
+  String get darkMode => 'Темная';
+
+  @override
+  String get systemMode => 'Системная';
+
+  @override
+  String get aboutDialogTitle => 'О приложении Goida AI';
+
+  @override
+  String get version => 'Версия';
+
+  @override
+  String get buildNumber => 'Сборка 0.2.0';
+
+  @override
+  String get appDescriptionFull =>
+      'Goida AI — это приложение для управления личными финансами с интеграцией искусственного интеллекта.\n\nФункции:\n• Учет активов и транзакций\n• Анализ расходов\n• ИИ-ассистент\n• Распознавание чеков\n• Уведомления и напоминания\n• Мультивалютность\n• Интеграция с WalletConnect';
+
+  @override
+  String get done => 'Готово';
+
+  @override
+  String get editProfile => 'Редактировать профиль';
+
+  @override
+  String get profileUpdated => 'Профиль обновлен';
+
+  @override
+  String get enterFullName => 'Введите полное имя';
+
+  @override
+  String get nameUpdated => 'Имя обновлено';
+
+  @override
+  String get attachPhoto => 'Прикрепить фото';
+
+  @override
+  String get attachFile => 'Прикрепить файл';
+
+  @override
+  String get clearChat => 'Очистить чат';
+
+  @override
+  String get clearChatConfirm =>
+      'Вы уверены, что хотите очистить историю чата?';
+
+  @override
+  String get chatCleared => 'История чата очищена';
+
+  @override
+  String get startConversation => 'Начните разговор с ИИ';
+
+  @override
+  String get aiTyping => 'ИИ печатает...';
+
+  @override
+  String get messageError => 'Не удалось отправить сообщение';
+
+  @override
+  String get image => 'Изображение';
+
+  @override
+  String get file => 'Файл';
+
+  @override
+  String get selectSource => 'Выберите источник';
+
+  @override
+  String get camera => 'Камера';
+
+  @override
+  String get gallery => 'Галерея';
+
+  @override
+  String get fileManager => 'Файловый менеджер';
+
+  @override
+  String get document => 'Документ';
+
+  @override
+  String get analyzeImage => 'Анализ изображения';
+
+  @override
+  String get uploadSuccess => 'Успешно загружено';
+
+  @override
+  String get uploadError => 'Ошибка загрузки';
+
+  @override
+  String get fileSizeTooLarge => 'Размер файла слишком большой';
+
+  @override
+  String get maxFileSize => 'Максимальный размер: 10МБ';
 }

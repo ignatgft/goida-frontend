@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'l10n/app_localizations.dart';
-import 'core/theme/app_theme.dart';
+import 'core/theme/ios_theme.dart';
 import 'presentation/screens/home_screen.dart';
 import 'presentation/screens/chat_screen.dart';
-import 'presentation/screens/messenger_screen.dart';
 import 'presentation/screens/chart_screen.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/widgets/bottom_nav.dart';
@@ -13,6 +13,7 @@ import 'presentation/providers/balance_provider.dart';
 import 'presentation/providers/chat_provider.dart';
 import 'presentation/providers/receipt_provider.dart';
 import 'presentation/providers/transaction_provider.dart';
+import 'presentation/providers/app_settings_provider.dart';
 
 class GoidaApp extends StatefulWidget {
   const GoidaApp({super.key});
@@ -27,9 +28,9 @@ class _GoidaAppState extends State<GoidaApp> {
   AuthProvider? _authProvider;
   String? _activeSessionKey;
 
+  // Единые экраны для всех платформ
   final List<Widget> _screens = [
     const HomeScreen(),
-    const MessengerScreen(),
     const ChatScreen(),
     const ChartScreen(),
   ];
@@ -60,7 +61,6 @@ class _GoidaAppState extends State<GoidaApp> {
     _authProvider = authProvider;
     _authProvider?.addListener(_handleAuthStateChanged);
 
-    // ✅ ВАЖНО: вызываем ПОСЛЕ build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _handleAuthStateChanged();
     });
@@ -124,15 +124,25 @@ class _GoidaAppState extends State<GoidaApp> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final appSettings = context.watch<AppSettingsProvider>();
 
-    if (!authProvider.isInitialized) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarBrightness: appSettings.themeMode == ThemeMode.dark
+          ? Brightness.dark
+          : Brightness.light,
+      statusBarIconBrightness: appSettings.themeMode == ThemeMode.dark
+          ? Brightness.light
+          : Brightness.dark,
+    ));
+
+    if (!authProvider.isInitialized || !appSettings.isInitialized) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Goida AI',
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: authProvider.themeMode,
-        locale: authProvider.locale,
+        theme: IosTheme.lightTheme,
+        darkTheme: IosTheme.darkTheme,
+        themeMode: appSettings.themeMode,
+        locale: appSettings.locale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -142,10 +152,10 @@ class _GoidaAppState extends State<GoidaApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Goida AI',
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: authProvider.themeMode,
-      locale: authProvider.locale,
+      theme: IosTheme.lightTheme,
+      darkTheme: IosTheme.darkTheme,
+      themeMode: appSettings.themeMode,
+      locale: appSettings.locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: authProvider.isAuthenticated
