@@ -7,6 +7,7 @@ import '../providers/app_settings_provider.dart';
 import '../providers/auth_provider.dart';
 import '../../data/models/user_settings.dart';
 import 'payment_history_screen.dart';
+import 'wallet_connect_management_screen.dart';
 
 /// Экран Настройки в едином стиле iOS Settings.app
 class SettingsScreen extends StatelessWidget {
@@ -125,6 +126,32 @@ class SettingsScreen extends StatelessWidget {
                   value: settings?.pushNotifications ?? true,
                   onChanged: (value) {
                     appSettings.updateSettings(pushNotifications: value);
+                  },
+                ),
+              ],
+            ),
+
+            const SliverPadding(
+              padding: EdgeInsets.only(bottom: IosDesignSystem.sectionSpacing),
+            ),
+
+            // WEB3 секция
+            _buildSection(
+              context: context,
+              header: 'Web3 Интеграция',
+              children: [
+                _buildListTile(
+                  context: context,
+                  icon: CupertinoIcons.link_circle,
+                  title: 'Подключенные кошельки',
+                  value: 'Управление Web3',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const WalletConnectManagementScreen(),
+                      ),
+                    );
                   },
                 ),
               ],
