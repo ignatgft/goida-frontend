@@ -8,6 +8,7 @@ import '../providers/balance_provider.dart';
 import '../providers/receipt_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/transaction_provider.dart';
+import '../widgets/asset_item.dart';
 import '../widgets/expense_entry_sheet.dart';
 import '../widgets/asset_snapshot_sheet.dart';
 import '../widgets/receipt_review_sheet.dart';
@@ -542,26 +543,82 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        ...assets.asMap().entries.map((entry) {
-          final index = entry.key;
-          final asset = entry.value;
-          return TweenAnimationBuilder<double>(
-            duration: Duration(milliseconds: 400 + (index * 100)),
-            curve: Curves.easeOutCubic,
-            tween: Tween(begin: 0.0, end: 1.0),
-            builder: (context, value, child) {
-              return Transform.translate(
-                offset: Offset(0, 20 * (1 - value)),
-                child: Opacity(
-                  opacity: value,
-                  child: _buildAssetRow(context, asset, l10n),
+        // Контейнер с закруглёнными углами для всех активов
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: IosDesignSystem.paddingMedium),
+          decoration: BoxDecoration(
+            color: IosDesignSystem.getSecondarySystemBackground(context),
+            borderRadius: BorderRadius.circular(IosDesignSystem.radiusLarge),
+            border: Border.all(
+              color: IosDesignSystem.getSeparator(context).withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              for (int i = 0; i < assets.length; i++) ...[
+                if (i > 0)
+                  Divider(
+                    height: 1,
+                    color: IosDesignSystem.getSeparator(context).withValues(alpha: 0.3),
+                  ),
+                AssetItem(
+                  asset: assets[i],
+                  onEdit: () => _showEditAssetSheet(context, assets[i]),
+                  onDelete: () => _showDeleteAssetDialog(context, assets[i]),
                 ),
-              );
-            },
-          );
-        }),
+              ],
+            ],
+          ),
+        ),
       ],
     );
+  }
+
+  void _showEditAssetSheet(BuildContext context, dynamic asset) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: IosDesignSystem.getSystemBackground(context),
+      builder: (_) => AssetSnapshotSheet(asset: asset),
+    );
+  }
+
+  Future<void> _showDeleteAssetDialog(BuildContext context, dynamic asset) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Удалить актив'),
+        content: Text('Вы уверены, что хотите удалить "${asset.name}"?'),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Отмена'),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final provider = context.read<BalanceProvider>();
+      await provider.deleteAsset(asset.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Актив удалён'),
+            backgroundColor: IosDesignSystem.successGreen,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildAssetRow(BuildContext context, dynamic asset, AppLocalizations l10n) {
