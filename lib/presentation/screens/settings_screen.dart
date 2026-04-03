@@ -6,6 +6,7 @@ import '../../l10n/app_localizations.dart';
 import '../providers/app_settings_provider.dart';
 import '../providers/auth_provider.dart';
 import '../../data/models/user_settings.dart';
+import 'payment_history_screen.dart';
 
 /// Экран Настройки в едином стиле iOS Settings.app
 class SettingsScreen extends StatelessWidget {
@@ -63,7 +64,12 @@ class SettingsScreen extends StatelessWidget {
                   context: context,
                   icon: CupertinoIcons.doc_text,
                   title: l10n.billingHistory,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const PaymentHistoryScreen()),
+                    );
+                  },
                 ),
               ],
             ),
