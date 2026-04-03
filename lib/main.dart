@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/api/api_client.dart';
+import 'core/cache/cache_service.dart';
 import 'data/repositories/finance_repository.dart';
 import 'presentation/providers/auth_provider.dart';
 import 'presentation/providers/balance_provider.dart';
@@ -15,6 +16,9 @@ import 'app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Инициализация кэширования
+  await CacheService().initialize();
 
   final api = ApiClient();
   final repo = FinanceRepository(api);
