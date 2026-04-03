@@ -6,6 +6,7 @@ import '../../l10n/app_localizations.dart';
 import '../../core/theme/ios_design_system.dart';
 import '../providers/balance_provider.dart';
 import '../providers/receipt_provider.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/expense_entry_sheet.dart';
 import '../widgets/asset_snapshot_sheet.dart';
 import '../widgets/receipt_review_sheet.dart';
@@ -57,6 +58,34 @@ class _HomeScreenState extends State<HomeScreen> {
           SliverAppBar(
             floating: true,
             backgroundColor: IosDesignSystem.getSystemBackground(context).withValues(alpha: 0.95),
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  final avatarUrl = authProvider.avatarUrl;
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                      );
+                    },
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: IosDesignSystem.getSeparator(context),
+                      backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                      child: avatarUrl == null
+                          ? Icon(
+                              CupertinoIcons.person_fill,
+                              size: 18,
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            )
+                          : null,
+                    ),
+                  );
+                },
+              ),
+            ),
             title: Text(
               l10n.appTitle,
               style: TextStyle(
