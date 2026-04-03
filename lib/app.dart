@@ -100,6 +100,10 @@ class _GoidaAppState extends State<GoidaApp> {
     final receiptProvider = context.read<ReceiptProvider>();
 
     if (nextSessionKey == null) {
+      // Пользователь вышел — сбрасываем всё
+      setState(() {
+        _currentIndex = 0;
+      });
       balanceProvider.clear();
       transactionProvider.clear();
       chatProvider.clearChat();

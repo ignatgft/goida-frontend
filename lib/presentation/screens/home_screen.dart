@@ -92,7 +92,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: IosDesignSystem.getSystemGroupedBackground(context),
-      body: CustomScrollView(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Future.wait([
+            context.read<BalanceProvider>().load(),
+            context.read<TransactionProvider>().load(),
+          ]);
+        },
+        child: CustomScrollView(
         slivers: [
           // Navigation Bar
           SliverAppBar(
@@ -126,13 +133,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-            title: Text(
-              l10n.appTitle,
-              style: TextStyle(
-                fontSize: IosDesignSystem.fontSizeTitle3,
-                fontWeight: IosDesignSystem.weightBold,
-                color: IosDesignSystem.getLabelPrimary(context),
-              ),
+            title: Consumer<AuthProvider>(
+              builder: (context, authProvider, child) {
+                final displayName = authProvider.displayName ?? 'Пользователь';
+                // Берём только имя (до пробела или полное если нет фамилии)
+                final firstName = displayName.split(' ').first;
+                return Text(
+                  firstName,
+                  style: TextStyle(
+                    fontSize: IosDesignSystem.fontSizeTitle3,
+                    fontWeight: IosDesignSystem.weightBold,
+                    color: IosDesignSystem.getLabelPrimary(context),
+                  ),
+                );
+              },
             ),
             actions: [
               IconButton(
@@ -189,6 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: EdgeInsets.only(bottom: 100),
           ),
         ],
+      ),
       ),
     );
   }
