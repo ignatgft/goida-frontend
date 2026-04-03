@@ -18,19 +18,16 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
-  final TextEditingController _contextController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final ImagePicker _imagePicker = ImagePicker();
-  
+
   final List<File> _selectedFiles = [];
   final List<AttachmentItem> _attachments = [];
-  bool _showContextWindow = false;
   bool _isAttachmentMenuOpen = false;
 
   @override
   void dispose() {
     _controller.dispose();
-    _contextController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -60,7 +57,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
     await chatProvider.sendMessage(
       text,
-      context: _contextController.text.isEmpty ? null : _contextController.text,
       images: images.isNotEmpty ? images : null,
     );
 
@@ -296,6 +292,53 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  /// Показать историю чатов
+  void _showChatHistory() {
+    final chatProvider = context.read<ChatProvider>();
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.4,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) {
+          if (chatProvider.sessions.isEmpty) {
+            return const Center(child: Text('Нет сохранённых чатов'));
+          }
+          
+          return ListView.builder(
+            controller: scrollController,
+            itemCount: chatProvider.sessions.length,
+            itemBuilder: (context, index) {
+              final session = chatProvider.sessions[index];
+              return ListTile(
+                leading: const CircleAvatar(child: Icon(CupertinoIcons.chat_bubble)),
+                title: Text(session.title),
+                subtitle: session.previewMessage != null
+                    ? Text(session.previewMessage!, maxLines: 1, overflow: TextOverflow.ellipsis)
+                    : null,
+                trailing: Text(
+                  '${session.updatedAt.day}.${session.updatedAt.month}',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  chatProvider.selectSession(session);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Открыт чат: ${session.title}')),
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final chatProvider = context.watch<ChatProvider>();
@@ -311,13 +354,9 @@ class _ChatScreenState extends State<ChatScreen> {
         foregroundColor: IosDesignSystem.getLabelPrimary(context),
         actions: [
           IconButton(
-            icon: Icon(_showContextWindow ? Icons.close_rounded : Icons.history_rounded),
-            onPressed: () {
-              setState(() {
-                _showContextWindow = !_showContextWindow;
-              });
-            },
-            tooltip: l10n.contextWindow,
+            icon: const Icon(CupertinoIcons.clock_fill),
+            onPressed: _showChatHistory,
+            tooltip: 'История чатов',
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline_rounded),
@@ -328,27 +367,6 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          // Контекстное окно
-          if (_showContextWindow)
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: IosDesignSystem.getSecondarySystemBackground(context),
-              child: TextField(
-                controller: _contextController,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: l10n.enterContext,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(IosDesignSystem.radiusMedium),
-                    borderSide: BorderSide(
-                      color: IosDesignSystem.getSeparator(context),
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: IosDesignSystem.getSystemBackground(context),
-                ),
-              ),
-            ),
           // Сообщения
           Expanded(
             child: messages.isEmpty
