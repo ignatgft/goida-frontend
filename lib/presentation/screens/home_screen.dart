@@ -7,6 +7,7 @@ import '../../core/theme/ios_design_system.dart';
 import '../providers/balance_provider.dart';
 import '../providers/receipt_provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/transaction_provider.dart';
 import '../widgets/expense_entry_sheet.dart';
 import '../widgets/asset_snapshot_sheet.dart';
 import '../widgets/receipt_review_sheet.dart';
@@ -28,10 +29,49 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _generateChartData();
+    // Загружаем данные после первого фрейма
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final transactionProvider = context.read<TransactionProvider>();
+      if (transactionProvider.list.isEmpty && !transactionProvider.loading) {
+        transactionProvider.load();
+      }
+      // Генерируем график из реальных данных
+      _generateChartDataFromTransactions(transactionProvider);
+    });
   }
 
-  void _generateChartData() {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Обновляем график когда транзакции загружены
+    final transactionProvider = context.read<TransactionProvider>();
+    if (transactionProvider.list.isNotEmpty && _chartData.length <= 1) {
+      _generateChartDataFromTransactions(transactionProvider);
+    }
+  }
+
+  void _generateChartDataFromTransactions(TransactionProvider provider) {
+    // Если есть транзакции, используем их для графика
+    if (provider.list.isNotEmpty) {
+      // Сортируем по дате и берем последние 30 дней
+      final sortedTx = List.from(provider.list)
+        ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      
+      // Берем последние 30 транзакций или меньше
+      final recentTx = sortedTx.length > 30 
+          ? sortedTx.sublist(sortedTx.length - 30) 
+          : sortedTx;
+      
+      setState(() {
+        _chartData = recentTx.map<double>((tx) => tx.amount.abs().toDouble()).toList();
+      });
+    } else {
+      // Fallback на демо данные если транзакций нет
+      _generateFallbackChartData();
+    }
+  }
+
+  void _generateFallbackChartData() {
     setState(() {
       _chartData = [
         125000, 127000, 126500, 128000, 130000, 129000, 131000,
