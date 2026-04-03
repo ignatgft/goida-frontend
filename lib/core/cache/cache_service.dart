@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 /// Сервис локального кэширования с использованием Hive
@@ -45,7 +46,7 @@ class CacheService {
   }
 
   /// Получить кэшированные транзакции
-  Future<dynamic> getCachedTransactions({String? category, String? period}) {
+  Future<dynamic?> getCachedTransactions({String? category, String? period}) {
     return _getWithTTL(
       _transactionsBox,
       'transactions_${category ?? 'all'}_${period ?? 'month'}',
@@ -67,7 +68,7 @@ class CacheService {
   }
 
   /// Получить кэшированные курсы
-  Future<dynamic> getCachedRates(String type) {
+  Future<dynamic?> getCachedRates(String type) {
     return _getWithTTL(_ratesBox, 'rates_$type', ratesTTL);
   }
 
@@ -77,7 +78,7 @@ class CacheService {
   }
 
   /// Получить кэшированный дашборд
-  Future<dynamic> getCachedDashboard({String? period}) {
+  Future<dynamic?> getCachedDashboard({String? period}) {
     return _getWithTTL(
       _dashboardBox,
       'dashboard_${period ?? 'month'}',
@@ -91,7 +92,7 @@ class CacheService {
   }
 
   /// Получить настройки
-  Future<dynamic> getCachedSettings(String key) {
+  Future<dynamic?> getCachedSettings(String key) {
     return _getWithTTL(_settingsBox, key, settingsTTL);
   }
 
@@ -101,7 +102,7 @@ class CacheService {
   }
 
   /// Получить данные с проверкой TTL
-  Future<dynamic> _getWithTTL(String boxName, String key, Duration ttl) {
+  Future<dynamic?> _getWithTTL(String boxName, String key, Duration ttl) {
     final box = Hive.box(boxName);
     final cachedAt = box.get('${key}_timestamp');
     
@@ -121,7 +122,7 @@ class CacheService {
       }
     }
     
-    return null;
+    return null as dynamic;
   }
 
   /// Сохранить данные с timestamp
