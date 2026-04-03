@@ -627,4 +627,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get maxFileSize => 'Maximum file size: 10MB';
+
+  @override
+  String get transactionUpdated => 'Transaction updated';
+
+  @override
+  String get transactionDeleted => 'Transaction deleted';
+
+  @override
+  String get errorUpdating => 'Error updating';
+
+  @override
+  String get errorDeleting => 'Error deleting';
+
+  @override
+  String get noReminders => 'No reminders';
+
+  @override
+  String get createReminder => 'Create reminder';
+
+  @override
+  String get newReminder => 'New reminder';
+
+  @override
+  String get title => 'Title';
+
+  @override
+  String get descriptionOptional => 'Description (optional)';
+
+  @override
+  String get type => 'Type';
+
+  @override
+  String get time => 'Time';
+
+  @override
+  String get recurring => 'Recurring';
+
+  @override
+  String get daily => 'Daily';
+
+  @override
+  String get create => 'Create';
+
+  @override
+  String get reminderCreated => 'Reminder created';
+
+  @override
+  String get noNotifications => 'No notifications';
+
+  @override
+  String get markAllAsRead => 'Mark all as read';
+
+  @override
+  String get justNow => 'Just now';
+
+  @override
+  String get minutesAgo => 'min. ago';
+
+  @override
+  String get hoursAgo => 'h. ago';
+
+  @override
+  String get daysAgo => 'days ago';
 }

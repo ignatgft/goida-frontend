@@ -22,8 +22,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final ImagePicker _imagePicker = ImagePicker();
   
-  List<File> _selectedFiles = [];
-  List<AttachmentItem> _attachments = [];
+  final List<File> _selectedFiles = [];
+  final List<AttachmentItem> _attachments = [];
   bool _showContextWindow = false;
   bool _isAttachmentMenuOpen = false;
 
@@ -82,28 +82,32 @@ class _ChatScreenState extends State<ChatScreen> {
         maxWidth: 1920,
       );
 
-      if (image != null) {
+      if (image != null && context.mounted) {
         final file = File(image.path);
         final fileSize = await file.length();
-        
+
         // Проверка размера (макс 10MB)
         if (fileSize > 10 * 1024 * 1024) {
           _showErrorSnackBar(context, l10n.fileSizeTooLarge);
           return;
         }
 
-        setState(() {
-          _attachments.add(AttachmentItem(
-            type: AttachmentType.image,
-            path: image.path,
-            name: source == ImageSource.camera 
-                ? l10n.camera 
-                : l10n.gallery,
-          ));
-        });
+        if (context.mounted) {
+          setState(() {
+            _attachments.add(AttachmentItem(
+              type: AttachmentType.image,
+              path: image.path,
+              name: source == ImageSource.camera
+                  ? l10n.camera
+                  : l10n.gallery,
+            ));
+          });
+        }
       }
     } catch (e) {
-      _showErrorSnackBar(context, l10n.uploadError);
+      if (context.mounted) {
+        _showErrorSnackBar(context, l10n.uploadError);
+      }
     }
   }
 
@@ -118,23 +122,27 @@ class _ChatScreenState extends State<ChatScreen> {
       if (result != null && result.files.single.path != null) {
         final filePath = result.files.single.path!;
         final fileSize = File(filePath).lengthSync();
-        
+
         // Проверка размера (макс 10MB)
         if (fileSize > 10 * 1024 * 1024) {
           _showErrorSnackBar(context, l10n.fileSizeTooLarge);
           return;
         }
 
-        setState(() {
-          _attachments.add(AttachmentItem(
-            type: AttachmentType.file,
-            path: filePath,
-            name: result.files.single.name,
-          ));
-        });
+        if (context.mounted) {
+          setState(() {
+            _attachments.add(AttachmentItem(
+              type: AttachmentType.file,
+              path: filePath,
+              name: result.files.single.name,
+            ));
+          });
+        }
       }
     } catch (e) {
-      _showErrorSnackBar(context, l10n.uploadError);
+      if (context.mounted) {
+        _showErrorSnackBar(context, l10n.uploadError);
+      }
     }
   }
 

@@ -11,7 +11,7 @@ class TestFinanceRepository implements FinanceRepository {
   @override
   final ApiClient api;
 
-  List<TransactionModel> _transactions = [];
+  final List<TransactionModel> _transactions;
   bool shouldFail = false;
 
   TestFinanceRepository({

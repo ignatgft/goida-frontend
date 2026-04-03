@@ -11,10 +11,10 @@ class TestFinanceRepository implements FinanceRepository {
   @override
   final ApiClient api;
 
-  BalanceOverview? _overviewToReturn;
-  FiatRates? _fiatRatesToReturn;
-  CryptoMarketRates? _cryptoRatesToReturn;
-  List<TransactionModel> _transactions = [];
+  final BalanceOverview? _overviewToReturn;
+  final FiatRates? _fiatRatesToReturn;
+  final CryptoMarketRates? _cryptoRatesToReturn;
+  final List<TransactionModel> _transactions;
   bool shouldFail = false;
 
   TestFinanceRepository({

@@ -8,6 +8,8 @@ import 'presentation/providers/transaction_provider.dart';
 import 'presentation/providers/chat_provider.dart';
 import 'presentation/providers/receipt_provider.dart';
 import 'presentation/providers/app_settings_provider.dart';
+import 'presentation/providers/notification_provider.dart';
+import 'presentation/providers/reminder_provider.dart';
 import 'app.dart';
 
 void main() async {
@@ -36,6 +38,12 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => ReceiptProvider(api),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => NotificationProvider(api),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ReminderProvider(api),
         ),
       ],
       child: const GoidaApp(),

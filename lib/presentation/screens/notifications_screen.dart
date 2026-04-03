@@ -16,8 +16,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      context.read<NotificationProvider>().loadNotifications();
+    // Load notifications after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<NotificationProvider>().loadNotifications();
+      }
     });
   }
 
@@ -53,13 +56,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   Icon(
                     Icons.notifications_none_rounded,
                     size: 80,
-                    color: theme.colorScheme.onSurface.withOpacity(0.3),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Нет уведомлений',
+                    l10n.noNotifications,
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -109,6 +112,7 @@ class _NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isRead = notification.isRead;
 
     return Dismissible(
@@ -129,12 +133,12 @@ class _NotificationTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: isRead
               ? theme.colorScheme.surface
-              : theme.primaryColor.withOpacity(0.05),
+              : theme.primaryColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isRead
                 ? theme.dividerColor
-                : theme.primaryColor.withOpacity(0.2),
+                : theme.primaryColor.withValues(alpha: 0.2),
           ),
         ),
         child: InkWell(
@@ -171,16 +175,16 @@ class _NotificationTile extends StatelessWidget {
                     Text(
                       notification.message,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      _formatTime(notification.createdAt),
+                      _formatTime(notification.createdAt, l10n),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.5),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                   ],
@@ -203,18 +207,18 @@ class _NotificationTile extends StatelessWidget {
     );
   }
 
-  String _formatTime(DateTime time) {
+  String _formatTime(DateTime time, AppLocalizations l10n) {
     final now = DateTime.now();
     final difference = now.difference(time);
 
     if (difference.inMinutes < 1) {
-      return 'Только что';
+      return l10n.justNow;
     } else if (difference.inHours < 1) {
-      return '${difference.inMinutes} мин. назад';
+      return '${difference.inMinutes} ${l10n.minutesAgo}';
     } else if (difference.inDays < 1) {
-      return '${difference.inHours} ч. назад';
+      return '${difference.inHours} ${l10n.hoursAgo}';
     } else if (difference.inDays < 7) {
-      return '${difference.inDays} дн. назад';
+      return '${difference.inDays} ${l10n.daysAgo}';
     } else {
       return '${time.day.toString().padLeft(2, '0')}.${time.month.toString().padLeft(2, '0')} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
     }

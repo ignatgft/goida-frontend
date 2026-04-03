@@ -16,8 +16,11 @@ class _RemindersScreenState extends State<RemindersScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      context.read<ReminderProvider>().loadReminders();
+    // Load reminders after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<ReminderProvider>().loadReminders();
+      }
     });
   }
 

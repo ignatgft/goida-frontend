@@ -49,9 +49,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
       );
 
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success ? 'Транзакция обновлена' : 'Ошибка обновления'),
+            content: Text(success ? l10n.transactionUpdated : l10n.errorUpdating),
             backgroundColor: success ? IosDesignSystem.successGreen : IosDesignSystem.errorRed,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -87,9 +88,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
       final success = await _transactionProvider.deleteTransaction(tx.id);
 
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success ? 'Транзакция удалена' : 'Ошибка удаления'),
+            content: Text(success ? l10n.transactionDeleted : l10n.errorDeleting),
             backgroundColor: success ? IosDesignSystem.successGreen : IosDesignSystem.errorRed,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

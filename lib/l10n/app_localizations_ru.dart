@@ -626,4 +626,67 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get maxFileSize => 'Максимальный размер: 10МБ';
+
+  @override
+  String get transactionUpdated => 'Транзакция обновлена';
+
+  @override
+  String get transactionDeleted => 'Транзакция удалена';
+
+  @override
+  String get errorUpdating => 'Ошибка обновления';
+
+  @override
+  String get errorDeleting => 'Ошибка удаления';
+
+  @override
+  String get noReminders => 'Нет напоминаний';
+
+  @override
+  String get createReminder => 'Создать напоминание';
+
+  @override
+  String get newReminder => 'Новое напоминание';
+
+  @override
+  String get title => 'Заголовок';
+
+  @override
+  String get descriptionOptional => 'Описание (необязательно)';
+
+  @override
+  String get type => 'Тип';
+
+  @override
+  String get time => 'Время';
+
+  @override
+  String get recurring => 'Повторяющееся';
+
+  @override
+  String get daily => 'Ежедневно';
+
+  @override
+  String get create => 'Создать';
+
+  @override
+  String get reminderCreated => 'Напоминание создано';
+
+  @override
+  String get noNotifications => 'Нет уведомлений';
+
+  @override
+  String get markAllAsRead => 'Отметить все как прочитанные';
+
+  @override
+  String get justNow => 'Только что';
+
+  @override
+  String get minutesAgo => 'мин. назад';
+
+  @override
+  String get hoursAgo => 'ч. назад';
+
+  @override
+  String get daysAgo => 'дн. назад';
 }
