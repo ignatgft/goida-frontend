@@ -20,6 +20,7 @@ class FinanceRepository {
       );
       if (res.statusCode != null && (res.statusCode! < 200 || res.statusCode! >= 300)) {
         debugPrint('getDashboardOverview returned status code: ${res.statusCode}');
+        debugPrint('Response body: ${res.data}');
         return BalanceOverview.empty(period);
       }
       final data = _extractMap(
@@ -30,7 +31,9 @@ class FinanceRepository {
         periodLabel: data['periodLabel'] as String? ?? _periodLabel(period),
       );
     } on DioException catch (e) {
-      debugPrint('DioException in getDashboardOverview: ${e.message}');
+      debugPrint('DioException in getDashboardOverview: ${e.type} - ${e.message}');
+      debugPrint('Error details: ${e.error}');
+      debugPrint('Response: ${e.response?.data}');
       return BalanceOverview.empty(period);
     } catch (e) {
       debugPrint('Error in getDashboardOverview: $e');
@@ -46,6 +49,10 @@ class FinanceRepository {
       );
       if (res.statusCode != null && (res.statusCode! < 200 || res.statusCode! >= 300)) {
         debugPrint('getAssetBalanceSummary returned status code: ${res.statusCode}');
+        // 405 Method Not Allowed - endpoint not implemented on backend
+        if (res.statusCode == 405) {
+          debugPrint('balance-summary endpoint not implemented, returning empty summary');
+        }
         return AssetBalanceSummary.empty(
           baseCurrency: SupportedCurrency.usd,
           periodLabel: _periodLabel(period),
@@ -112,6 +119,7 @@ class FinanceRepository {
       );
       if (res.statusCode != null && (res.statusCode! < 200 || res.statusCode! >= 300)) {
         debugPrint('getCryptoRates returned status code: ${res.statusCode}');
+        debugPrint('Response body: ${res.data}');
         return CryptoMarketRates.empty(quoteCurrency);
       }
       final root = _extractMap(res.data, preferredKeys: const ['data']);
@@ -123,7 +131,9 @@ class FinanceRepository {
         'prices': prices,
       });
     } on DioException catch (e) {
-      debugPrint('DioException in getCryptoRates: ${e.message}');
+      debugPrint('DioException in getCryptoRates: ${e.type} - ${e.message}');
+      debugPrint('Error details: ${e.error}');
+      debugPrint('Response: ${e.response?.data}');
       return CryptoMarketRates.empty(quoteCurrency);
     } catch (e) {
       debugPrint('Error in getCryptoRates: $e');
